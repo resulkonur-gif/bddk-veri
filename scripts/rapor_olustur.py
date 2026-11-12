@@ -25,13 +25,16 @@ AD_ESLE = {
     "Sermaye Hesaplamasına Dahil Edilecek Borçlanma Araçları": "Sermaye Hesaplamasına Dahil Edilecek Borçlanma Araçları (Net)",
 }
 ORAN_TABLOLARI = {15, 16, 17}
+TEKRAR_EK = {11: ["Varlık", "Yükümlülük"]}
 
 
 def kalem_adi(s):
     s = re.sub(r"\*+", "", str(s))
     # formül parantezlerini kaldır: (37+38), (11+12+13+29), (2 den 24'e)
-    s = re.sub(r"\s*\((?:\d+\s*\+[\d+\s]*|\d+ den [^)]*)\)", "", s)
-    s = re.sub(r"\s+", " ", s).strip()
+    s = re.sub(r"\s*[(\[](?=[^)\]]*\d)[\d\s+\-.…]+[)\]]", "", s)
+    s = re.sub(r"\s*\(\d+ den [^)]*\)", "", s)
+    s = re.sub(r"\s*\[[\d\s+\-.…()]*\]", "", s)
+    s = re.sub(r"\s+", " ", s).strip().rstrip("-").strip()
     return AD_ESLE.get(s, s)
 
 
@@ -53,10 +56,40 @@ def yil_e(y):
     return f"{y}’{ek}"
 
 
+def ayni_adlari_ayir(df):
+    """Aynı tabloda, aynı dönemde tekrar eden alt kalem adlarını (ör. 'a) Gerçek Kişiler') üst kalemin adıyla ayırır."""
+    anahtar = ["donem", "tablo_no", "grup", "sutun"]
+    ilk = df[(df.grup == df.grup.iloc[0]) & (df.sutun == df.groupby("tablo_no").sutun.transform("first"))]
+    tekrar = ilk.groupby(["donem", "tablo_no", "ad"]).size()
+    tekrar = tekrar[tekrar > 1].reset_index()[["tablo_no", "ad"]].drop_duplicates()
+    if tekrar.empty:
+        return df
+    yeni = {}
+    for (d, t), x in ilk[ilk.tablo_no.isin(tekrar.tablo_no)].groupby(["donem", "tablo_no"]):
+        ust = None
+        hedef = set(tekrar[tekrar.tablo_no == t].ad)
+        sayac = {}
+        for sira, ad in zip(x.sira, x.ad):
+            alt = bool(re.match(r"^[a-zçğıöşü]\)\s", ad))
+            if alt and ad in hedef and ust:
+                yeni[(d, t, sira)] = f"{ad} · {ust}"
+            elif not alt and ad in hedef:
+                # üst düzeyde tekrar eden ad (ör. Likidite'de varlık ve yükümlülük tarafındaki 'Türev İşlemler')
+                sayac[ad] = sayac.get(ad, 0) + 1
+                ek = TEKRAR_EK.get(int(t), [])
+                yeni[(d, t, sira)] = f"{ad} ({ek[sayac[ad] - 1] if sayac[ad] <= len(ek) else sayac[ad]})"
+            if not alt:
+                ust = yeni.get((d, t, sira), ad)
+    k = list(zip(df.donem, df.tablo_no, df.sira))
+    df["ad"] = [yeni.get(x, a) for x, a in zip(k, df.ad)]
+    return df
+
+
 def veri_hazirla():
     df = pd.concat(pd.read_csv(f, encoding="utf-8-sig", dtype={"donem": str})
                    for f in sorted((KOK / "veri" / "aylik" / "uzun").glob("*.csv")))
     df["ad"] = df.kalem.map(kalem_adi)
+    df = ayni_adlari_ayir(df)
     bilgi = json.loads((KOK / "veri" / "aylik" / "tablolar.json").read_text("utf-8"))
     per = sorted(df.donem.unique())
     grp = [g for g in GRUP_SIRA if g in set(df.grup)] + sorted(set(df.grup) - set(GRUP_SIRA))
@@ -65,6 +98,9 @@ def veri_hazirla():
     tablolar = []
     for no, d in df.groupby("tablo_no"):
         b = bilgi.get(str(no), {})
+        cak = d.groupby(["donem", "sutun", "grup", "ad"]).size()
+        if (cak > 1).any():
+            raise SystemExit(f"tablo {no}: aynı ada düşen kalemler: {sorted(set(cak[cak > 1].index.get_level_values(3)))}")
         cols = list(dict.fromkeys(b.get("sutunlar", []) + list(d.sutun.unique())))
         # kalem sırası: son dönemdeki sıra; yalnız eski dönemlerde olanlar en son göründükleri sıraya göre araya girer
         son = d.sort_values(["donem", "sira"]).drop_duplicates("ad", keep="last")

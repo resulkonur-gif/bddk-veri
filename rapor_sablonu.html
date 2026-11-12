@@ -448,8 +448,30 @@ details.ozdet>summary .sub{font-size:13px;font-weight:400;color:var(--ink-3)}
 .gchk i{width:10px;height:10px;border-radius:2px;display:inline-block}
 .loading{font-size:14px;color:var(--ink-3)}
 .nv-tools .field input[type=search]{flex:none;width:260px;max-width:100%}
-.choices.three{grid-template-columns:repeat(3,minmax(0,1fr))}
-@media (max-width:900px){.choices.three{grid-template-columns:minmax(0,1fr)}}
+.toc{display:flex;flex-wrap:wrap;gap:8px}
+.toc a{display:inline-flex;align-items:center;height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--m-ov);font-size:13px;font-weight:500;color:var(--m-on-surface);text-decoration:none;background:var(--m-surface)}
+.toc a:hover{background:var(--m-state)}
+.tsecs{display:flex;flex-direction:column;gap:36px}
+.tsec{display:flex;flex-direction:column;gap:14px;scroll-margin-top:150px}
+.tsec-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;padding-top:18px;border-top:1px solid var(--m-ov)}
+.tsec-h h3{font-size:22px;font-weight:500}
+.tsec-h .muted{font-size:13px}
+.cgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:860px){.cgrid{grid-template-columns:minmax(0,1fr)}}
+.cpanel{border-radius:16px;background:var(--m-scl);box-shadow:var(--e1);padding:16px 16px 10px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.cpanel h4{margin:0;font-size:15px;font-weight:600}
+.cpanel .csub{font-size:12px;color:var(--ink-3);margin-top:-4px}
+.cpanel .chartbox{height:280px}
+.cpanel.wide{grid-column:1/-1}
+details.ttab{border-radius:16px;background:var(--m-scl);box-shadow:var(--e1)}
+details.ttab>summary{cursor:pointer;padding:14px 18px;font-weight:500;list-style:none;display:flex;align-items:center;gap:10px}
+details.ttab>summary::-webkit-details-marker{display:none}
+details.ttab>summary::before{content:"";width:8px;height:8px;border-right:2px solid var(--m-primary);border-bottom:2px solid var(--m-primary);transform:rotate(-45deg);transition:transform .15s}
+details.ttab[open]>summary::before{transform:rotate(45deg)}
+details.ttab .ttab-in{padding:0 12px 14px;display:flex;flex-direction:column;gap:10px}
+details.ttab .ttab-ctl{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px;padding:0 6px}
+details.ttab .ttab-ctl select{min-height:36px;padding:4px 10px;border-radius:18px;font-size:14px}
+details.ttab .scroll{box-shadow:none;max-height:70vh;overflow:auto}
 .kpi .k-c small{font-weight:400;color:var(--ink-3)}
 .kpi[aria-expanded="true"] .k-c small{color:var(--m-on-pc)}
 </style>
@@ -460,7 +482,7 @@ details.ozdet>summary .sub{font-size:13px;font-weight:400;color:var(--ink-3)}
     <h1>Türk Bankacılık Sektörü<br><span class="land-h1b">BDDK Aylık Bülten Verileri</span></h1>
     <p class="land-sub">BDDK’nın Aylık Bülten’inde yayımladığı 17 tablonun tamamı, {{ARALIK_DEN_YA}} {{N}} ay ve 10 banka grubu için tek sayfada: bilanço, kâr-zarar, krediler, tüketici ve KOBİ kredileri, sektörel kredi dağılımı, menkul kıymetler, mevduatın türü ve vadesi, likidite, sermaye yeterliliği, yabancı para pozisyonu, bilanço dışı işlemler ve rasyolar. Sektörü ve banka gruplarını istediğiniz dönemde karşılaştırın, her kalemin geçmişini grafikte görün.</p>
     <p class="land-q">Nereden başlayalım?</p>
-    <div class="choices three">
+    <div class="choices">
       <button type="button" class="choice" data-go="sec-ozet">
         <span class="ch-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 18.49 9.5 12.48l4 4L22 6.92 20.59 5.5l-7.09 7.97-4-4L2 16.99z"/></svg></span>
         <span class="ch-t">Sektör özeti</span>
@@ -472,6 +494,12 @@ details.ozdet>summary .sub{font-size:13px;font-weight:400;color:var(--ink-3)}
         <span class="ch-t">Banka grupları</span>
         <span class="ch-d">Mevduat, katılım, kalkınma ve yatırım bankaları ile kamu, yerli özel ve yabancı bankalar yan yana; bilanço yapısıyla.</span>
         <span class="ch-go">Grupları aç <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></span>
+      </button>
+      <button type="button" class="choice t" data-go="sec-bulten">
+        <span class="ch-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg></span>
+        <span class="ch-t">Bülten tabloları</span>
+        <span class="ch-d">17 tablo alt alta, bölüm bölüm: her tablonun öne çıkan kalemleri grafiklerle, altında tablonun tamamı.</span>
+        <span class="ch-go">Tabloları grafiklerle aç <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></span>
       </button>
       <button type="button" class="choice v" data-go="sec-tablo">
         <span class="ch-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 3H4a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h6V3zm4 0v18h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1h-6zm-6 14H5v-2h3v2zm0-4H5v-2h3v2zm0-4H5V7h3v2zm11 8h-3v-2h3v2zm0-4h-3v-2h3v2zm0-4h-3V7h3v2z"/></svg></span>
@@ -497,7 +525,7 @@ details.ozdet>summary .sub{font-size:13px;font-weight:400;color:var(--ink-3)}
     <header class="hdr">
       <div class="hdr-top"><span class="eyebrow">BDDK Aylık Bülten · 17 tablo · 10 banka grubu</span><span class="mode-chip">TL · yurt dışı şubeler dâhil</span></div>
       <h1>Türk Bankacılık Sektörü Aylık Verileri</h1>
-      <p class="lede">{{ARALIK_DEN_YA}} {{N}} ay; mevduat, katılım, kalkınma ve yatırım bankaları ile sahiplik grupları. Özet göstergeler, banka gruplarının karşılaştırması ve bilanço yapısı; en altta 17 tablonun tüm kalemlerini gezin.</p>
+      <p class="lede">{{ARALIK_DEN_YA}} {{N}} ay; mevduat, katılım, kalkınma ve yatırım bankaları ile sahiplik grupları. Özet göstergeler, banka gruplarının karşılaştırması ve bilanço yapısı; ardından 17 tablo bölüm bölüm grafikleriyle, en altta da tüm kalemleri gezme.</p>
       <div class="hdr-meta"><span>Birim: milyar TL (aksi belirtilmedikçe)</span><span>Veri: <span id="mDate"></span> tarihinde güncellendi</span><span>Tutarlar nominaldir</span></div>
     </header>
 
@@ -551,6 +579,19 @@ details.ozdet>summary .sub{font-size:13px;font-weight:400;color:var(--ink-3)}
         <div class="legend" id="stLegP"></div>
         <div class="struct" id="struct"></div>
       </div>
+    </section>
+
+    <section aria-labelledby="h-bt" id="sec-bulten">
+      <div class="sec-head">
+        <h2 id="h-bt">Bülten tabloları</h2>
+        <p class="insight">17 tablo bölüm bölüm: her tablonun öne çıkan kalemleri grafiklerle, altında tablonun tamamı. Grafikler dönem çubuğundaki seçime ve aşağıdaki banka grubuna göre çizilir; grupları karşılaştıran grafiklerde işaretli gruplar görünür.</p>
+      </div>
+      <div class="controls">
+        <label class="field">Grafiklerde banka grubu<select id="tGrp"></select></label>
+      </div>
+      <div class="gchk" id="tGroups"></div>
+      <nav class="toc" id="tToc" aria-label="Tablolar"></nav>
+      <div id="tSecs" class="tsecs"></div>
     </section>
 
     <section aria-labelledby="h-tablo" id="sec-tablo">
@@ -671,7 +712,7 @@ function renderKpis(){
 }
 function renderKpiGroups(){
   $("kpiGroups").innerHTML=D.grp.map((n,g)=>`<label><input type="checkbox" data-g="${g}" ${S.kg.has(g)?"checked":""}><i style="background:${gcol(g)}"></i>${esc(n)}</label>`).join("");
-  $("kpiGroups").querySelectorAll("input").forEach(i=>i.onchange=()=>{const g=+i.dataset.g;i.checked?S.kg.add(g):S.kg.delete(g);renderKpiChart();});
+  $("kpiGroups").querySelectorAll("input").forEach(i=>i.onchange=()=>{const g=+i.dataset.g;i.checked?S.kg.add(g):S.kg.delete(g);renderKpiChart();if(D._t){renderTGroups();refreshTSecs();}});
 }
 function chartOpts(unit,dec){
   const ink=css("--ink-2"),line=css("--line");
@@ -770,7 +811,7 @@ function renderX(){
   let body="<tbody>";
   for(const [it,i] of xRows()){
     const L=lvl(it.ad);
-    body+=`<tr class="l${L}${bold(it.ad)?" b":""}" data-i="${i}"><td><div class="xrow"><span class="xn">${esc(it.ad)}</span><button type="button" class="chartbtn" data-i="${i}" aria-pressed="${S.open.has(i)}" aria-label="${esc(it.ad)} grafiği" title="Grafik">${'<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M1.5 12.5h11M3 10l3-3.5 2.5 2L12 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'}</button></div></td>`+
+    body+=`<tr class="l${L}${bold(it.ad)?" b":""}" data-i="${i}"><td><div class="xrow"><span class="xn">${esc(it.ad.split(" · ")[0])}</span><button type="button" class="chartbtn" data-i="${i}" aria-pressed="${S.open.has(i)}" aria-label="${esc(it.ad)} grafiği" title="Grafik">${'<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M1.5 12.5h11M3 10l3-3.5 2.5 2L12 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'}</button></div></td>`+
       cols.map(x=>xCell(t,i,c,x.g,x.p,x.prev)).join("")+"</tr>";
     if(S.open.has(i))body+=`<tr class="xchart"><td colspan="${span}"><div><div class="chartbox"><canvas id="xc_${i}"></canvas></div></div></td></tr>`;
   }
@@ -799,17 +840,163 @@ function csvDownload(){
   const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["﻿"+lines.join("\n")],{type:"text/csv;charset=utf-8"}));a.download=name;document.body.appendChild(a);a.click();a.remove();
 }
 
+// ---- bülten tabloları (bölüm bölüm grafikler) ----
+const SCALE=no=>no===5?1e-6:(no===15||no===16||no===17?1:1e-3);
+const UNIT=no=>no===5||no<15?"milyar TL":(no===16?"adet":"%");
+function rawv(no,k,col,g,p){const t=T[no];if(!t)return null;const i=t.idx[k];if(i==null)return null;const c=col==null?t.nc-1:t.cols.indexOf(col);if(c<0)return null;return val(t,i,c,g,p);}
+const sv=(no,k,col,g,p,raw)=>{const v=rawv(no,k,col,g,p);return v==null?null:(raw?v:v*SCALE(no));};
+function ttm(no,k,col,g,p){const m=+D.per[p].slice(5);const v=rawv(no,k,col,g,p);if(m===12)return v==null?null:v*SCALE(no);
+  const dec=p-m,ly=p-12;if(dec<0||ly<0)return null;const a=rawv(no,k,col,g,dec),b=rawv(no,k,col,g,ly);return v==null||a==null||b==null?null:(v+a-b)*SCALE(no);}
+const ratio=(a,b)=>a==null||b==null||b===0?null:a/b*100;
+const ann=(no,k,g,p)=>{const v=rawv(no,k,null,g,p);return v==null?null:v*12/(+D.per[p].slice(5));};
+// seri tanımı: {l, f:(g,p)=>değer}
+const S_=(l,no,k,col,raw)=>({l,f:(g,p)=>sv(no,k,col,g,p,raw)});
+const SR=(l,f)=>({l,f});
+const SECTORS=["Tarım, Avcılık ve Ormancılık","Madencilik ve Taşocakçılığı","İmalat Sanayi","Elektrik, Gaz ve Su Kaynakları Ürt. Dağt. San.","İnşaat","Toptan ve Perakende Ticaret, Motorlu Araçlar Servis Hizm. İle Kişisel ve Hane Halkı Ürünleri","Otel ve Restoranlar (Turizm)","Taşımacılık, Depolama ve Haberleşme","Finansal Aracılık","Emlak Kom., Kiralama ve İşletmecilik Faal.","Savunma ve Kamu Yönetimi ve Zorunlu Sosyal Güv. Kurumları","Eğitim","Sağlık ve Sosyal Hizmetler","Diğer Hizmetler","Ferdi Kredi Konut","Ferdi Kredi Otomobil","Ferdi Kredi Diğer","Kredi Kartları","Diğer"];
+const SECT_SHORT={"Toptan ve Perakende Ticaret, Motorlu Araçlar Servis Hizm. İle Kişisel ve Hane Halkı Ürünleri":"Toptan ve perakende ticaret","Elektrik, Gaz ve Su Kaynakları Ürt. Dağt. San.":"Elektrik, gaz ve su","Savunma ve Kamu Yönetimi ve Zorunlu Sosyal Güv. Kurumları":"Kamu yönetimi","Emlak Kom., Kiralama ve İşletmecilik Faal.":"Emlak, kiralama","Otel ve Restoranlar (Turizm)":"Turizm","Taşımacılık, Depolama ve Haberleşme":"Taşımacılık ve haberleşme","Tarım, Avcılık ve Ormancılık":"Tarım","Madencilik ve Taşocakçılığı":"Madencilik"};
+const VADE=["Vadesiz","1 Aya Kadar","1-3 Ay Arası","3-6 Ay Arası","6-12 Ay Arası","1  Yıl Üzeri"];
+const VADE_L=["Vadesiz","1 aya kadar","1-3 ay","3-6 ay","6-12 ay","1 yıl üzeri"];
+const KZ_GELIR=[["Net faiz geliri","NET FAİZ (KAR PAYI) GELİRİ (GİDERİ)"],["Faiz dışı gelirler","Toplam Faiz Dışı (Kar Payı Dışındaki) Gelirler"],["Faiz dışı giderler","Toplam Faiz Dışı (Kar Payı Dışındaki) Giderler"],["Takip provizyonu","Takipteki Alacaklar Özel Provizyonu"],["Dönem net kârı","DÖNEM NET KARI (ZARARI)"]];
+const TSPEC={
+ 1:[{t:"line",h:"Ana kalemler",u:"milyar TL",s:[S_("Krediler",1,"Krediler"),S_("Mevduat",1,"Mevduat (Katılım Fonu)"),S_("Özkaynaklar",1,"TOPLAM ÖZKAYNAKLAR"),S_("Bankalara borçlar",1,"Bankalara Borçlar"),S_("İhraç edilen menkul kıymetler",1,"İhraç Edilen Menkul Kıymetler (Net)"),S_("Repo",1,"Repo İşlemlerinden Sağlanan Fonlar")]},
+    {t:"line",h:"Yabancı para payı",u:"%",sub:"YP tutarın toplama oranı",s:[SR("Aktifler",(g,p)=>ratio(rawv(1,"TOPLAM AKTİFLER","YP",g,p),rawv(1,"TOPLAM AKTİFLER","Toplam",g,p))),SR("Krediler",(g,p)=>ratio(rawv(1,"Krediler","YP",g,p),rawv(1,"Krediler","Toplam",g,p))),SR("Mevduat",(g,p)=>ratio(rawv(1,"Mevduat (Katılım Fonu)","YP",g,p),rawv(1,"Mevduat (Katılım Fonu)","Toplam",g,p)))]},
+    {t:"line",h:"Kredi kalitesi ve karşılıklar",u:"%",sub:"takipteki alacak oranı ve karşılıkların takiptekilere oranı",s:[SR("Takipteki / (krediler + takipteki)",(g,p)=>{const a=rawv(1,"Takipteki Alacaklar",null,g,p),k=rawv(1,"Krediler",null,g,p);return a==null||k==null?null:a/(a+k)*100}),SR("Üçüncü aşama karşılık / takipteki",(g,p)=>ratio(rawv(1,"c) Temerrüt - Özel Karşılık (Üçüncü Aşama)",null,g,p),rawv(1,"Takipteki Alacaklar",null,g,p)))],y2:1},
+    {t:"grp",h:"Toplam aktif, gruplara göre",u:"milyar TL",f:(g,p)=>sv(1,"TOPLAM AKTİFLER",null,g,p)}],
+ 2:[{t:"line",h:"Son 12 aylık gelir ve giderler",u:"milyar TL",sub:"yıl başından kümülatif veriden 12 aylık toplam",s:KZ_GELIR.map(([l,k])=>SR(l,(g,p)=>ttm(2,k,null,g,p)))},
+    {t:"bar",h:"Gelir tablosu, seçilen dönem",u:"milyar TL",sub:"yıl başından kümülatif",s:[["Faiz gelirleri","Toplam Faiz (Kar Payı) Gelirleri"],["Faiz giderleri","Toplam Faiz (Kar Payı) Giderleri"],["Net faiz geliri","NET FAİZ (KAR PAYI) GELİRİ (GİDERİ)"],["Takip provizyonu","Takipteki Alacaklar Özel Provizyonu"],["Faiz dışı gelirler","Toplam Faiz Dışı (Kar Payı Dışındaki) Gelirler"],["Faiz dışı giderler","Toplam Faiz Dışı (Kar Payı Dışındaki) Giderler"],["Personel giderleri","Personel Giderleri"],["Sermaye piyasası işlemleri","Sermaye Piyasası İşlemleri Karları (Zararları) (Net)"],["Kambiyo","Kambiyo Karları (Zararları) (Net)"],["Vergi öncesi kâr","VERGİ ÖNCESİ KAR (ZARAR)"],["Dönem net kârı","DÖNEM NET KARI (ZARARI)"]].map(([l,k])=>S_(l,2,k))},
+    {t:"line",h:"Faiz gelirlerinin kaynağı (son 12 ay)",u:"milyar TL",s:[["Krediler","Kredilerden Alınan Faizler (Kar Payları)"],["Menkul değerler (itfa edilmiş maliyet)","İtfa Edilmiş Maliyeti Üzerinden Değerlenen Menkul Değerlerden Alınan Faizler"],["Menkul değerler (GUD DKG)","GUD Farkı Diğer Kapsamlı Gelire Yansıtılan Menkul Değerlerden Alınan Faizler"],["Mevduata verilen faizler","Mevduata Verilen Faizler (Katılım Fonlarına Ödenen Kar Payları)"],["Repo faizleri","Repo İşlemlerine Verilen Faizler"]].map(([l,k])=>SR(l,(g,p)=>ttm(2,k,null,g,p)))},
+    {t:"grp",h:"Dönem net kârı, son 12 ay, gruplara göre",u:"milyar TL",f:(g,p)=>ttm(2,"DÖNEM NET KARI (ZARARI)",null,g,p)}],
+ 3:[{t:"bar",h:"Kredi türleri, seçilen dönem",u:"milyar TL",sort:1,top:14,s:()=>T[3].items.map(x=>x.ad).filter(a=>a!=="Toplam Krediler").map(a=>S_(a,3,a))},
+    {t:"line",h:"Vade ve para birimi dağılımı",u:"%",sub:"toplam kredilere oran",s:[SR("Kısa vadeli",(g,p)=>ratio(rawv(3,"Toplam Krediler","Kısa Toplam",g,p),rawv(3,"Toplam Krediler","Toplam",g,p))),SR("Orta ve uzun vadeli",(g,p)=>ratio(rawv(3,"Toplam Krediler","Orta Uzun Toplam",g,p),rawv(3,"Toplam Krediler","Toplam",g,p))),SR("Yabancı para",(g,p)=>ratio(rawv(3,"Toplam Krediler","Toplam YP",g,p),rawv(3,"Toplam Krediler","Toplam",g,p)))]},
+    {t:"line",h:"Başlıca kredi türleri",u:"milyar TL",s:[S_("İşletme kredileri",3,"İşletme Kredileri"),S_("Kredi kartları",3,"Kredi Kartları"),S_("Tüketici kredileri",3,"Tüketici Kredileri"),S_("Taksitli ticari",3,"Taksitli Ticari Krediler"),S_("İhracat kredileri",3,"İhracat Kredileri"),S_("Diğer yatırım kredileri",3,"Diğer Yatırım Kredileri")]},
+    {t:"grp",h:"Toplam krediler, gruplara göre",u:"milyar TL",f:(g,p)=>sv(3,"Toplam Krediler",null,g,p)}],
+ 4:[{t:"line",h:"Bireysel krediler",u:"milyar TL",s:[S_("Konut",4,"Tüketici Kredileri - Konut"),S_("Taşıt",4,"Tüketici Kredileri - Taşıt"),S_("İhtiyaç",4,"Tüketici Kredileri - İhtiyaç"),S_("Bireysel kredi kartları",4,"Bireysel Kredi Kartları")]},
+    {t:"line",h:"Takipteki oranları",u:"%",sub:"takipteki / (canlı + takipteki)",s:[["Konut","Tüketici Kredileri - Konut","Takipteki Konut Kredileri"],["Taşıt","Tüketici Kredileri - Taşıt","Takipteki Taşıt Kredileri"],["İhtiyaç","Tüketici Kredileri - İhtiyaç","Takipteki İhtiyaç Kredileri"],["Bireysel kredi kartı","Bireysel Kredi Kartları","Takipteki Bireysel Kredi Kartları"],["Taksitli ticari","Taksitli Ticari Krediler","Takipteki Taksitli Ticari Krd."]].map(([l,a,b])=>SR(l,(g,p)=>{const x=rawv(4,a,null,g,p),y=rawv(4,b,null,g,p);return x==null||y==null||x+y===0?null:y/(x+y)*100}))},
+    {t:"line",h:"Kredi kartları: taksitli ve taksitsiz",u:"milyar TL",s:[S_("Bireysel taksitli",4,"Bireysel Kredi Kartları - Taksitli"),S_("Bireysel taksitsiz",4,"Bireysel Kredi Kartları - Taksitsiz"),S_("Kurumsal",4,"Kurumsal Kredi Kartları")]},
+    {t:"line",h:"Taksitli ticari krediler",u:"milyar TL",s:[S_("İşyeri",4,"Taksitli Ticari Krediler - İşyeri"),S_("Taşıt",4,"Taksitli Ticari Krediler - Taşıt"),S_("İhtiyaç",4,"Taksitli Ticari Krediler - İhtiyaç")]}],
+ 5:[{t:"bar",h:"Sektörlere göre nakdi krediler, seçilen dönem",u:"milyar TL",sort:1,s:SECTORS.map(a=>S_(SECT_SHORT[a]||a,5,a,"Nakdi Krediler"))},
+    {t:"bar",h:"Sektörlere göre takipteki oranı, seçilen dönem",u:"%",sort:1,sub:"takipteki / toplam nakdi krediler",s:SECTORS.map(a=>SR(SECT_SHORT[a]||a,(g,p)=>ratio(rawv(5,a,"Takipteki Krediler",g,p),rawv(5,a,"Toplam Nakdi Krediler",g,p))))},
+    {t:"line",h:"Başlıca sektörler",u:"milyar TL",sub:"nakdi krediler",s:["İmalat Sanayi","Toptan ve Perakende Ticaret, Motorlu Araçlar Servis Hizm. İle Kişisel ve Hane Halkı Ürünleri","İnşaat","Elektrik, Gaz ve Su Kaynakları Ürt. Dağt. San.","Finansal Aracılık","Kredi Kartları"].map(a=>S_(SECT_SHORT[a]||a,5,a,"Nakdi Krediler"))},
+    {t:"line",h:"Gayrinakdi krediler, başlıca sektörler",u:"milyar TL",s:["İmalat Sanayi","İnşaat","Toptan ve Perakende Ticaret, Motorlu Araçlar Servis Hizm. İle Kişisel ve Hane Halkı Ürünleri","Elektrik, Gaz ve Su Kaynakları Ürt. Dağt. San."].map(a=>S_(SECT_SHORT[a]||a,5,a,"Gayri Nakdi Krediler"))}],
+ 6:[{t:"line",h:"KOBİ nakdi kredileri",u:"milyar TL",s:[S_("Mikro",6,"Mikro İşletmelere Kullandırılan Krediler","Toplam Nakdi Krediler"),S_("Küçük",6,"Küçük İşletmelere Kullandırılan Krediler","Toplam Nakdi Krediler"),S_("Orta",6,"Orta Büyüklükteki İşletmelere Kullandırılan Krediler","Toplam Nakdi Krediler")]},
+    {t:"line",h:"KOBİ kredilerinin payı ve takipteki oranı",u:"%",s:[SR("KOBİ / toplam krediler",(g,p)=>ratio(rawv(6,"Toplam KOBİ Kredileri","Toplam Nakdi Krediler",g,p),rawv(1,"Krediler",null,g,p))),SR("KOBİ takipteki oranı",(g,p)=>{const a=rawv(6,"Toplam KOBİ Kredileri","Toplam Takipteki Krediler",g,p),b=rawv(6,"Toplam KOBİ Kredileri","Toplam Nakdi Krediler",g,p);return a==null||b==null?null:a/(a+b)*100})],y2:1},
+    {t:"line",h:"KOBİ müşteri sayısı",u:"bin",s:[["Mikro","Mikro İşletme Niteliğindeki Müşteri Sayısı (Adet)"],["Küçük","Küçük İşletme Niteliğindeki Müşteri Sayısı (Adet)"],["Orta","Orta Büyüklükteki İşletme Niteliğindeki Müşteri Sayısı (Adet)"]].map(([l,k])=>SR(l,(g,p)=>{const v=rawv(6,k,"Müşteri Sayısı (Net)",g,p);return v==null?null:v/1000}))},
+    {t:"line",h:"KOBİ gayrinakdi kredileri",u:"milyar TL",s:[S_("Mikro",6,"Mikro İşletmelere Kullandırılan Krediler","Toplam Gayri Nakdi Krediler"),S_("Küçük",6,"Küçük İşletmelere Kullandırılan Krediler","Toplam Gayri Nakdi Krediler"),S_("Orta",6,"Orta Büyüklükteki İşletmelere Kullandırılan Krediler","Toplam Gayri Nakdi Krediler")]}],
+ 7:[{t:"line",h:"Sendikasyon ve seküritizasyon kredileri",u:"milyar TL",s:[S_("Sendikasyon (dış ticaret dışı)",7,"Sendikasyon Kredileri (Dış Ticaret Finansmanı Amaçlı Olmayanlar)"),S_("Sendikasyon (dış ticaret)",7,"Sendikasyon Kredileri (Dış Ticaret Finansmanı Amaçlı Olanlar)"),S_("Seküritizasyon",7,"Seküritizasyon Kredileri")]},
+    {t:"line",h:"Yabancı para payı",u:"%",s:["Sendikasyon Kredileri (Dış Ticaret Finansmanı Amaçlı Olmayanlar)","Sendikasyon Kredileri (Dış Ticaret Finansmanı Amaçlı Olanlar)","Seküritizasyon Kredileri"].map((k,j)=>SR(["Sendikasyon (dış ticaret dışı)","Sendikasyon (dış ticaret)","Seküritizasyon"][j],(g,p)=>ratio(rawv(7,k,"YP",g,p),rawv(7,k,"Toplam",g,p))))}],
+ 8:[{t:"bar",h:"Menkul kıymet türleri, seçilen dönem",u:"milyar TL",sort:1,top:14,s:()=>T[8].items.map(x=>x.ad).filter(a=>!/^(Menkul Değerler|TOPLAM MENKUL DEĞERLER|REPO KONUSU|TEMİNATA VERİLEN)/.test(a)).map(a=>S_(a,8,a))},
+    {t:"line",h:"Menkul kıymetler: TL ve YP",u:"milyar TL",s:[S_("TP",8,"TOPLAM MENKUL DEĞERLER","TP"),S_("YP",8,"TOPLAM MENKUL DEĞERLER","YP"),S_("Repo konusu",8,"REPO KONUSU MENKUL DEĞERLER"),S_("Teminata verilen",8,"TEMİNATA VERİLEN MENKUL DEĞERLER")]},
+    {t:"line",h:"Başlıca kalemler",u:"milyar TL",s:[S_("Devlet tahvilleri",8,"Devlet Tahvilleri"),S_("Eurobond",8,"Hazinece Yurt Dışında İhraç Edilen Eurobond ve Benz.Tahviller"),S_("Kira sertifikaları (yurt içi)",8,"Hazinece Yurt İçinde İhraç Edilen Kira Sertifikaları (Sukuk)"),S_("Hisse senetleri",8,"Hisse Senetleri"),S_("Yatırım fonları",8,"Yatırım Fonu Katılma Belgeleri")]},
+    {t:"grp",h:"Toplam menkul değerler, gruplara göre",u:"milyar TL",f:(g,p)=>sv(8,"TOPLAM MENKUL DEĞERLER",null,g,p)}],
+ 9:[{t:"bar",h:"Mevduatın tutar dilimlerine dağılımı, seçilen dönem",u:"milyar TL",s:["On Bin TL'ye Kadar","On Bin-Elli Bin TL Arası","Elli Bin-İkiyüzelli Bin TL Arası","İkiyüzelli Bin -Bir Milyon  TL Arası","Bir Milyon TL Üzeri"].map((c,j)=>S_(["10 bin TL’ye kadar","10–50 bin TL","50–250 bin TL","250 bin–1 milyon TL","1 milyon TL üzeri"][j],9,"Toplam Mevduat",c))},
+    {t:"line",h:"Mevduat türleri (yurt içi yerleşik)",u:"milyar TL",s:[S_("TL mevduat",9,"TP Mevduat / Katılım Fonları - Yurt İçi Yerleşik"),S_("Döviz tevdiat",9,"Döviz Tevdiat Hesabı / Katılım Fonları - Yurt İçi Yerleşik"),S_("Kıymetli maden",9,"Kıymetli Maden Depo Hesapları - Yurt İçi Yerleşik")]},
+    {t:"line",h:"1 milyon TL üzeri mevduatın payı",u:"%",s:[SR("Toplam mevduat",(g,p)=>ratio(rawv(9,"Toplam Mevduat","Bir Milyon TL Üzeri",g,p),rawv(9,"Toplam Mevduat","Toplam",g,p))),SR("TL mevduat (yurt içi)",(g,p)=>ratio(rawv(9,"TP Mevduat / Katılım Fonları - Yurt İçi Yerleşik","Bir Milyon TL Üzeri",g,p),rawv(9,"TP Mevduat / Katılım Fonları - Yurt İçi Yerleşik","Toplam",g,p))),SR("Döviz tevdiat (yurt içi)",(g,p)=>ratio(rawv(9,"Döviz Tevdiat Hesabı / Katılım Fonları - Yurt İçi Yerleşik","Bir Milyon TL Üzeri",g,p),rawv(9,"Döviz Tevdiat Hesabı / Katılım Fonları - Yurt İçi Yerleşik","Toplam",g,p)))]},
+    {t:"line",h:"Mudi sayısı (yurt içi yerleşik)",u:"milyon",s:[SR("Mudi sayısı",(g,p)=>{const v=rawv(9,"Mudi Sayısı - Yurt İçi Yerleşik","Toplam",g,p);return v==null?null:v/1e6})]}],
+ 10:[{t:"bar",h:"Mevduatın vade dağılımı, seçilen dönem",u:"milyar TL",s:VADE.map((c,j)=>S_(VADE_L[j],10,"TOPLAM MEVDUAT",c))},
+    {t:"line",h:"Vade dilimlerinin payı",u:"%",s:VADE.map((c,j)=>SR(VADE_L[j],(g,p)=>ratio(rawv(10,"TOPLAM MEVDUAT",c,g,p),rawv(10,"TOPLAM MEVDUAT","Toplam",g,p))))},
+    {t:"line",h:"TL mevduatın vade dilimleri (yurt içi)",u:"milyar TL",s:VADE.map((c,j)=>S_(VADE_L[j],10,"TP Mevduat / Katılım Fonları - Yurt İçi Yerleşik",c))},
+    {t:"line",h:"Döviz tevdiatın vade dilimleri (yurt içi)",u:"milyar TL",s:VADE.map((c,j)=>S_(VADE_L[j],10,"Döviz Tevdiat Hesabı / Katılım Fonları - Yurt İçi Yerleşik",c))}],
+ 11:[{t:"line",h:"Likidite yeterlilik oranı",u:"%",s:["Yedi Gün","Bir Ay","Üç Ay","On İki Ay"].map(c=>S_(c,11,"Likidite Yeterlilik Oranı",c,1))},
+    {t:"bar",h:"Vade dilimlerine göre net likidite, seçilen dönem",u:"milyar TL",s:["Yedi Gün","Bir Ay","Üç Ay","On İki Ay"].map(c=>S_(c,11,"Vade Dilimlerine Göre Net Likidite Açığı / Fazlası",c))},
+    {t:"line",h:"Bir aylık varlıklar ve yükümlülükler",u:"milyar TL",s:[S_("Varlıklar",11,"TOPLAM VARLIKLAR","Bir Ay"),S_("Yükümlülükler",11,"TOPLAM YÜKÜMLÜLÜKLER","Bir Ay")]},
+    {t:"grp",h:"Bir aylık likidite yeterlilik oranı, gruplara göre",u:"%",f:(g,p)=>rawv(11,"Likidite Yeterlilik Oranı","Bir Ay",g,p)}],
+ 12:[{t:"line",h:"Sermaye oranları",u:"%",s:[S_("Sermaye yeterliliği",12,"Sermaye Yeterliliği Standart Rasyosu ((5/7)100) (YÜZDE)",null,1),S_("Çekirdek sermaye yeterliliği",12,"Çekirdek Sermaye Yeterliliği Rasyosu ((6/7)100) (YÜZDE)",null,1)]},
+    {t:"bar",h:"Risk ağırlıklı tutarların dağılımı, seçilen dönem",u:"milyar TL",s:[S_("Kredi riski",12,"Kredi Riskine Esas Tutar"),S_("Piyasa riski",12,"Piyasa Riskine Esas Tutar"),S_("Operasyonel risk",12,"Operasyonel Riske Esas Tutar")]},
+    {t:"line",h:"Özkaynak ve risk ağırlıklı kalemler",u:"milyar TL",s:[S_("Yasal özkaynak",12,"Yasal Özkaynak"),S_("Ana sermaye",12,"Ana Sermaye Toplamı"),S_("Katkı sermaye",12,"Katkı Sermaye Toplamı"),S_("Risk ağırlıklı kalemler",12,"Risk Ağırlıklı Kalemler Toplamı")]},
+    {t:"grp",h:"Sermaye yeterliliği, gruplara göre",u:"%",f:(g,p)=>rawv(12,"Sermaye Yeterliliği Standart Rasyosu ((5/7)100) (YÜZDE)",null,g,p)}],
+ 13:[{t:"line",h:"Döviz varlıkları ve yükümlülükleri",u:"milyar TL",s:[S_("Bilanço içi varlıklar",13,"Bilanço İçi Varlıklar"),S_("Bilanço içi yükümlülükler",13,"Bilanço İçi Yükümlülükler"),S_("Bilanço dışı varlıklar",13,"Bilanço Dışı Varlıklar"),S_("Bilanço dışı yükümlülükler",13,"Bilanço Dışı Yükümlülükler")]},
+    {t:"line",h:"Net genel pozisyon",u:"milyar TL",s:[S_("YP net genel pozisyon",13,"Yabancı Para Net Genel Pozisyonu"),SR("Bilanço içi pozisyon",(g,p)=>{const a=sv(13,"Bilanço İçi Varlıklar",null,g,p),b=sv(13,"Bilanço İçi Yükümlülükler",null,g,p);return a==null||b==null?null:a-b})]},
+    {t:"grp",h:"Net genel pozisyon / yasal özkaynak, gruplara göre",u:"%",f:(g,p)=>rawv(13,"Yabancı Para Net Genel Pozisyon / Yasal Özkaynak Standart Oranı (Yüzde)",null,g,p)}],
+ 14:[{t:"line",h:"Bilanço dışı işlemler",u:"milyar TL",s:[S_("Gayrinakdi krediler",14,"GAYRİNAKDİ KREDİ VE YÜKÜMLÜLÜKLER"),S_("Türev finansal araçlar",14,"Türev Finansal Araçlar"),S_("Diğer taahhütler",14,"Diğer Taahhütler")]},
+    {t:"bar",h:"Gayrinakdi kredilerin dağılımı, seçilen dönem",u:"milyar TL",s:[S_("Teminat mektupları",14,"Teminat Mektupları"),S_("Akreditifler",14,"Akreditifler"),S_("Kabul kredileri",14,"Kabul Kredileri"),S_("Cirolar",14,"Cirolar"),S_("Diğer garanti ve kefaletler",14,"Diğer Garanti ve Kefaletler"),S_("Teminat mektupsuz prefinansman",14,"Teminat Mektupsuz Prefinansman Kredileri")]},
+    {t:"line",h:"Türev işlemler",u:"milyar TL",s:[S_("Para swapları",14,"Para Swapları"),S_("Faiz swapları",14,"Faiz Swapları"),S_("Vadeli döviz alım",14,"Vadeli Döviz Alım İşlemleri"),S_("Diğer türev alım",14,"Diğer Türev Alım")]},
+    {t:"bar",h:"Teminat mektupları türleri, seçilen dönem",u:"milyar TL",s:()=>T[14].items.slice(T[14].idx["a) Geçici Teminat Mektupları"],T[14].idx["Teminatına göre Teminat Mektupları"]).map(x=>S_(x.ad.replace(/^[a-z]\)\s/,""),14,x.ad))}],
+ 15:[{t:"grp",h:"Takipteki alacak oranı",u:"%",f:(g,p)=>rawv(15,"Takipteki Alacaklar (Brüt) / Toplam Nakdi Krediler (%)",null,g,p)},
+     {t:"grp",h:"Özkaynak kârlılığı (yıllıklaştırılmış)",u:"%",f:(g,p)=>ann(15,"Dönem Net Kârı (Zararı) / Ortalama Özkaynaklar (%)",g,p)},
+     {t:"grp",h:"Kredi / mevduat",u:"%",f:(g,p)=>{const v=rawv(15,"Toplam Nakdi Krediler / Toplam Mevduat (%)",null,g,p);return v>0?v:null}},
+     {t:"grp",h:"Yasal özkaynak / risk ağırlıklı kalemler",u:"%",f:(g,p)=>rawv(15,"Yasal Özkaynak / Risk Ağırlıklı Kalemler Toplamı (%)",null,g,p)},
+     {t:"line",h:"Faiz getirisi ve maliyeti (yıllıklaştırılmış)",u:"%",s:[SR("Faiz gelirleri / faiz getirili aktifler",(g,p)=>ann(15,"Toplam Faiz Gelirleri / Faiz Getirili Aktifler Ortalaması (%)",g,p)),SR("Faiz giderleri / faiz maliyetli pasifler",(g,p)=>ann(15,"Toplam Faiz Giderleri / Faiz Maliyetli Pasifler Ortalaması (%)",g,p)),SR("Net faiz geliri / aktifler",(g,p)=>ann(15,"Net Faiz Geliri (Gideri) / Ortalama Toplam Aktifler (%)",g,p))]},
+     {t:"line",h:"Mevduat yapısı ve karşılıklar",u:"%",s:[S_("Vadesiz / toplam mevduat",15,"Vadesiz Mevduat / Toplam Mevduat (%)",null,1),S_("1 milyon TL üzeri / toplam mevduat",15,"Yüksek Montanlı (1 Milyon TL ve Üzeri) Mevduat / Toplam Mevduat (%)",null,1),S_("Karşılık / takipteki",15,"Takipteki Alacaklar Karşılığı / Brüt Takipteki Alacaklar (%)",null,1)]}],
+ 16:[{t:"line",h:"Şube ve ATM sayısı",u:"adet",s:[S_("Yurt içi şube",16,"Yurt İçi Şube Sayısı"),S_("ATM",16,"ATM Sayısı")]},
+     {t:"line",h:"Personel sayısı",u:"bin kişi",s:[SR("Yurt içi personel",(g,p)=>{const v=rawv(16,"Yurt İçi Personel Sayısı",null,g,p);return v==null?null:v/1000})]},
+     {t:"grp",h:"Banka sayısı, gruplara göre",u:"adet",f:(g,p)=>rawv(16,"Banka Sayısı",null,g,p)},
+     {t:"bar",h:"Grupların şube sayısı, seçilen dönem",u:"adet",byGroup:1,f:(g,p)=>rawv(16,"Yurt İçi Şube Sayısı",null,g,p)}],
+ 17:[{t:"line",h:"Yurt dışı şubelerin payı",u:"%",s:[S_("Krediler",17,"Yurt Dışı Şubeler Kredileri / Toplam Krediler"),S_("Aktifler",17,"Yurt Dışı Şubeler Aktifleri / Toplam Aktifler"),S_("Mevduat",17,"Yurt Dışı Şubeler Mevduatı (Fon) / Toplam Mevduat (Fon)")]},
+     {t:"grp",h:"Yurt dışı şube aktiflerinin payı, gruplara göre",u:"%",f:(g,p)=>rawv(17,"Yurt Dışı Şubeler Aktifleri / Toplam Aktifler",null,g,p)}],
+};
+const PAL=["#2B5EA7","#E69F00","#009E73","#CC79A7","#56B4E9","#D55E00","#6A4C93","#8C564B"];
+let tObs,tCharts={};
+function decFor(u){return u==="%"?2:(u==="adet"?0:1)}
+function drawTChart(cv){
+  const [no,j]=cv.dataset.c.split(":").map(Number);const sp=TSPEC[no][j];const key=cv.dataset.c;
+  if(tCharts[key]){tCharts[key].destroy();delete tCharts[key];}
+  const g=S.tg,dec=decFor(sp.u),labels=D.per.map(pShort);let cfg;
+  const base=chartOpts(sp.u,dec);
+  if(sp.t==="line"){const ss=typeof sp.s==="function"?sp.s():sp.s;
+    cfg={type:"line",data:{labels,datasets:ss.map((s,k)=>({label:s.l+(sp.y2&&k>0?" (sağ eksen)":""),data:D.per.map((_,p)=>s.f(g,p)),borderColor:PAL[k%PAL.length],backgroundColor:PAL[k%PAL.length],spanGaps:false,yAxisID:sp.y2&&k>0?"y2":"y"}))},options:base};
+    if(sp.y2)base.scales.y2={position:"right",ticks:{color:css("--ink-2"),callback:v=>nf(v,0)},grid:{display:false}};
+    cfg.options.plugins.legend={display:true,position:"bottom",labels:{color:css("--ink-2"),boxWidth:10,boxHeight:10}};}
+  else if(sp.t==="grp"){
+    cfg={type:"line",data:{labels,datasets:[...S.kg].sort((a,b)=>a-b).map(gg=>({label:D.grp[gg],data:D.per.map((_,p)=>sp.f(gg,p)),borderColor:gcol(gg),backgroundColor:gcol(gg),borderWidth:D.grp[gg]==="Sektör"?3:2}))},options:base};
+    cfg.options.plugins.legend={display:true,position:"bottom",labels:{color:css("--ink-2"),boxWidth:10,boxHeight:10}};}
+  else{ // bar
+    let rows;
+    if(sp.byGroup)rows=GORDER.filter(([s,n])=>s!=="sec"&&n in D.gi&&n!=="Sektör").map(([s,n])=>[n,sp.f(D.gi[n],S.p),gcol(D.gi[n])]);
+    else{const ss=typeof sp.s==="function"?sp.s():sp.s;rows=ss.map((s,k)=>[s.l,s.f(g,S.p),PAL[0]]);}
+    rows=rows.filter(r=>r[1]!=null);
+    if(sp.sort)rows.sort((a,b)=>b[1]-a[1]);if(sp.top)rows=rows.slice(0,sp.top);
+    cv.parentElement.style.height=Math.max(180,rows.length*26+50)+"px";
+    const ink=css("--ink-2"),line=css("--line");
+    cfg={type:"bar",data:{labels:rows.map(r=>r[0]),datasets:[{data:rows.map(r=>r[1]),backgroundColor:rows.map(r=>r[1]<0?css("--bad"):r[2]),borderRadius:3,barPercentage:.8}]},
+      options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${nf(c.parsed.x,dec)} ${sp.u}`}}},
+        scales:{x:{ticks:{color:ink,callback:v=>nf(v,0)},grid:{color:line}},y:{ticks:{color:ink,autoSkip:false,callback:function(v){const s=this.getLabelForValue(v);return s.length>34?s.slice(0,33)+"…":s}},grid:{display:false}}}}};
+  }
+  tCharts[key]=new Chart(cv,cfg);
+}
+function tSub(sp){const per=sp.t==="bar"?`${pLong(D.per[S.p])}`:`${pLong(D.per[0])} – ${pLong(D.per[D.np-1])}`;
+  const who=sp.t==="grp"||sp.byGroup?"işaretli gruplar":D.grp[S.tg];return `${sp.u} · ${who} · ${per}${sp.sub?" · "+sp.sub:""}`;}
+function buildTSecs(){
+  $("tToc").innerHTML=D.tab.map(t=>`<a href="#tb-${t.no}">${t.no}. ${esc(t.ad)}</a>`).join("");
+  $("tSecs").innerHTML=D.tab.map(t=>{const sps=TSPEC[t.no]||[];
+    return `<div class="tsec" id="tb-${t.no}"><div class="tsec-h"><h3>${t.no}. ${esc(t.ad)}</h3><span class="muted">tablo birimi: ${esc(t.birim||"–")} · ${t.ni} kalem</span></div>
+    <div class="cgrid">${sps.map((sp,j)=>`<div class="cpanel${sps.length%2&&j===sps.length-1?" wide":""}"><h4>${esc(sp.h)}</h4><div class="csub" data-sub="${t.no}:${j}">${esc(tSub(sp))}</div><div class="chartbox"><canvas data-c="${t.no}:${j}"></canvas></div></div>`).join("")}</div>
+    <details class="ttab" data-t="${t.no}"><summary>Tablonun tamamı: ${esc(t.ad)}, ${t.ni} kalem, 10 grup</summary><div class="ttab-in"></div></details></div>`}).join("");
+  tObs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){drawTChart(e.target);tObs.unobserve(e.target);}}),{rootMargin:"300px"});
+  $("tSecs").querySelectorAll("canvas[data-c]").forEach(c=>tObs.observe(c));
+  $("tSecs").querySelectorAll("details.ttab").forEach(d=>d.addEventListener("toggle",()=>{if(d.open)renderTTab(d);}));
+}
+function refreshTSecs(){
+  $("tSecs").querySelectorAll("[data-sub]").forEach(el=>{const [no,j]=el.dataset.sub.split(":").map(Number);el.textContent=tSub(TSPEC[no][j]);});
+  $("tSecs").querySelectorAll("canvas[data-c]").forEach(c=>{if(tCharts[c.dataset.c])drawTChart(c);});
+  $("tSecs").querySelectorAll("details.ttab[open]").forEach(renderTTab);
+}
+function renderTTab(d){
+  const t=T[+d.dataset.t];const box=d.querySelector(".ttab-in");
+  const c=d.dataset.col!=null?+d.dataset.col:t.nc-1;
+  const sel=t.nc>1?`<label>Sütun <select data-tc>${t.cols.map((x,i)=>`<option value="${i}" ${i===c?"selected":""}>${esc(x)}</option>`).join("")}</select></label>`:"";
+  const gs=GORDER.filter(([s,n])=>s!=="sec"&&n in D.gi).map(([s,n])=>D.gi[n]);
+  let h=`<div class="ttab-ctl">${sel}<span class="muted">${pLong(D.per[S.p])} · ${esc(t.birim||"")}</span></div><div class="scroll"><table class="xt2"><thead><tr><th>Kalem</th>${gs.map(g=>`<th>${esc(D.grp[g])}</th>`).join("")}</tr></thead><tbody>`;
+  t.items.forEach((it,i)=>{h+=`<tr class="l${lvl(it.ad)}${bold(it.ad)?" b":""}"><td><span class="xn">${esc(it.ad.split(" · ")[0])}</span></td>${gs.map(g=>{const v=val(t,i,c,g,S.p);return v==null?`<td class="nil">–</td>`:`<td class="${v<0?"neg":""}">${nf(v,decOf(t))}</td>`}).join("")}</tr>`;});
+  box.innerHTML=h+"</tbody></table></div>";
+  const s=box.querySelector("[data-tc]");if(s)s.onchange=()=>{d.dataset.col=s.value;renderTTab(d);};
+}
+function renderTGroups(){
+  $("tGroups").innerHTML=D.grp.map((n,g)=>`<label><input type="checkbox" data-g="${g}" ${S.kg.has(g)?"checked":""}><i style="background:${gcol(g)}"></i>${esc(n)}</label>`).join("");
+  $("tGroups").querySelectorAll("input").forEach(i=>i.onchange=()=>{const g=+i.dataset.g;i.checked?S.kg.add(g):S.kg.delete(g);renderKpiGroups();renderKpiChart();refreshTSecs();});
+}
+
 // ---- dönem ----
 function setPeriod(p){S.p=Math.max(0,Math.min(D.np-1,p));$("pSel").value=S.p;$("pPrev").disabled=S.p===0;$("pNext").disabled=S.p===D.np-1;
   const q=cmpIdx(S.p);$("pNote").textContent=q<0?"Karşılaştırma dönemi arşivde yok":`${pLong(D.per[S.p])} ↔ ${pLong(D.per[q])}`;renderAll();}
-function renderAll(){renderKpis();renderGroups();renderStruct();renderX();}
+function renderAll(){renderKpis();renderGroups();renderStruct();renderX();if(D._t)refreshTSecs();}
 function segWire(id,attr,key,cb){$(id).querySelectorAll("button").forEach(b=>b.onclick=()=>{S[key]=b.dataset[attr];$(id).querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));cb&&cb();});}
 
 function init(){
   const fill=(id,arr)=>$(id).innerHTML=arr;
   fill("pSel",D.per.map((p,i)=>[p,i]).reverse().map(([p,i])=>`<option value="${i}">${pLong(p)}</option>`).join(""));
   const go=GORDER.filter(([s,n])=>s!=="sec"&&n in D.gi).map(([s,n])=>`<option value="${D.gi[n]}">${s==="sub"?" ":""}${esc(n)}</option>`).join("");
-  fill("kGrp",go);fill("xGrp",go);$("kGrp").value=S.g;$("xGrp").value=S.xg;
+  fill("kGrp",go);fill("xGrp",go);fill("tGrp",go);$("kGrp").value=S.g;$("xGrp").value=S.xg;S.tg=S.g;$("tGrp").value=S.tg;
+  $("tGrp").onchange=()=>{S.tg=+$("tGrp").value;refreshTSecs();};
   fill("xTab",D.tab.map(t=>`<option value="${t.no}">${t.no}. ${esc(t.ad)}</option>`).join(""));
   $("mDate").textContent=$("fDate").textContent=D.meta.guncelleme;
   $("pSel").onchange=()=>setPeriod(+$("pSel").value);
@@ -822,7 +1009,7 @@ function init(){
   segWire("xView","v","xv",renderX);segWire("xRng","r","xr",renderX);segWire("xMode","m","xm",renderX);
   let tm;$("xQ").oninput=()=>{clearTimeout(tm);tm=setTimeout(()=>{S.q=$("xQ").value.trim();renderX();},150);};
   $("xCsv").onclick=csvDownload;
-  fillXControls();renderKpiGroups();setPeriod(D.np-1);renderKpiChart();
+  fillXControls();renderKpiGroups();renderTGroups();buildTSecs();D._t=1;setPeriod(D.np-1);renderKpiChart();
 }
 
 // ---- açılış ve tema ----
@@ -832,7 +1019,7 @@ document.querySelectorAll("#landing .choice").forEach(b=>b.onclick=async()=>{
   window.scrollTo(0,0);if(b.dataset.go!=="sec-ozet")setTimeout(()=>$(b.dataset.go).scrollIntoView(),30);});
 $("homeBtn").onclick=()=>{$("app").hidden=true;$("landing").hidden=false;window.scrollTo(0,0);};
 $("themeBtn").onclick=()=>{const r=document.documentElement;const dark=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;r.dataset.theme=dark?"light":"dark";
-  if(D&&D._init){renderKpiChart();renderX();}};
+  if(D&&D._init){renderKpiChart();renderX();refreshTSecs();}};
 window.addEventListener("scroll",()=>$("appbar").classList.toggle("lift",scrollY>8),{passive:true});
 ready.catch(e=>{$("landFoot").insertAdjacentHTML("beforebegin",`<p class="loading">Veri açılamadı: ${esc(e.message)}. Güncel bir tarayıcı (Chrome, Edge, Firefox, Safari 16.4+) gerekir.</p>`)});
 </script>
