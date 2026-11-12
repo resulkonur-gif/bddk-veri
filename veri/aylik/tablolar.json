@@ -1,0 +1,187 @@
+{
+  "1": {
+    "tablo": "Bilanço",
+    "baslik": "Bilanço (milyon TL), Dönem:2026/9",
+    "birim": "milyon TL",
+    "sutunlar": [
+      "TP",
+      "YP",
+      "Toplam"
+    ]
+  },
+  "2": {
+    "tablo": "Kar Zarar",
+    "baslik": "Kar Zarar (milyon TL), Dönem:2026/9",
+    "birim": "milyon TL",
+    "sutunlar": [
+      "TP",
+      "YP",
+      "Toplam"
+    ]
+  },
+  "3": {
+    "tablo": "Krediler",
+    "baslik": "Krediler (milyon TL), Dönem:2026/9",
+    "birim": "milyon TL",
+    "sutunlar": [
+      "Kısa TP",
+      "Kısa YP",
+      "Kısa Toplam",
+      "Orta Uzun TP",
+      "Orta Uzun YP",
+      "Orta Uzun Toplam",
+      "Toplam TP",
+      "Toplam YP",
+      "Toplam"
+    ]
+  },
+  "4": {
+    "tablo": "Tüketici Kredileri",
+    "baslik": "Tüketici Kredileri (milyon TL), Dönem:2026/9",
+    "birim": "milyon TL",
+    "sutunlar": [
+      "TP",
+      "YP",
+      "Toplam"
+    ]
+  },
+  "5": {
+    "tablo": "Sektörel Kredi Dağılımı",
+    "baslik": "Sektörel Kredi Dağılımı (bin TL), Dönem:2026/9",
+    "birim": "bin TL",
+    "sutunlar": [
+      "Kısa Vadeli Nakdi Krediler",
+      "Orta ve Uzun Vadeli Nakdi Krediler",
+      "Nakdi Krediler",
+      "Takipteki Krediler",
+      "Toplam Nakdi Krediler",
+      "Gayri Nakdi Krediler"
+    ]
+  },
+  "6": {
+    "tablo": "KOBİ Kredileri",
+    "baslik": "KOBİ Kredileri  (milyon TL), Dönem:2026/9",
+    "birim": "milyon TL",
+    "sutunlar": [
+      "Nakdi Kredi TP",
+      "Nakdi Kredi YP",
+      "Toplam Nakdi Krediler",
+      "Takip Kredi TP",
+      "Takip Kredi YP",
+      "Toplam Takipteki Krediler",
+      "Gayri Nakdi Kredi TP",
+      "Gayri Nakdi Kredi YP",
+      "Toplam Gayri Nakdi Krediler",
+      "Müşteri Sayısı (Net)"
+    ]
+  },
+  "7": {
+    "tablo": "Sendikasyon Seküritizasyon Kredileri",
+    "baslik": "Sendikasyon Seküritizasyon Kredileri (milyon TL), Dönem:2026/9",
+    "birim": "milyon TL",
+    "sutunlar": [
+      "TP",
+      "YP",
+      "Toplam"
+    ]
+  },
+  "8": {
+    "tablo": "Menkul Kıymetler",
+    "baslik": "Menkul Kıymetler (milyon TL), Dönem:2026/9",
+    "birim": "milyon TL",
+    "sutunlar": [
+      "TP",
+      "YP",
+      "Toplam"
+    ]
+  },
+  "9": {
+    "tablo": "Mevduat Türler İtibarıyla",
+    "baslik": "Mevduat Türler İtibarıyla (milyon TL), Dönem:2026/9",
+    "birim": "milyon TL",
+    "sutunlar": [
+      "On Bin TL'ye Kadar",
+      "On Bin-Elli Bin TL Arası",
+      "Elli Bin-İkiyüzelli Bin TL Arası",
+      "İkiyüzelli Bin -Bir Milyon  TL Arası",
+      "Bir Milyon TL Üzeri",
+      "Toplam"
+    ]
+  },
+  "10": {
+    "tablo": "Mevduat Vade İtibarıyla",
+    "baslik": "Mevduat Vade İtibarıyla (milyon TL), Dönem:2026/9",
+    "birim": "milyon TL",
+    "sutunlar": [
+      "Vadesiz",
+      "1 Aya Kadar",
+      "1-3 Ay Arası",
+      "3-6 Ay Arası",
+      "6-12 Ay Arası",
+      "1  Yıl Üzeri",
+      "Toplam"
+    ]
+  },
+  "11": {
+    "tablo": "Likidite Durumu",
+    "baslik": "Likidite Durumu (milyon TL), Dönem:2026/9",
+    "birim": "milyon TL",
+    "sutunlar": [
+      "Yedi Gün",
+      "Bir Ay",
+      "Üç Ay",
+      "On İki Ay",
+      "Toplam"
+    ]
+  },
+  "12": {
+    "tablo": "Sermaye Yeterliliği",
+    "baslik": "Sermaye Yeterliliği (milyon TL), Dönem:2026/9",
+    "birim": "milyon TL",
+    "sutunlar": [
+      "Toplam"
+    ]
+  },
+  "13": {
+    "tablo": "Yabancı Para Pozisyonu",
+    "baslik": "Yabancı Para Pozisyonu (milyon TL), Dönem:2026/9",
+    "birim": "milyon TL",
+    "sutunlar": [
+      "Toplam"
+    ]
+  },
+  "14": {
+    "tablo": "Bilanço Dışı İşlemler",
+    "baslik": "Bilanço Dışı İşlemler (milyon TL), Dönem:2026/9",
+    "birim": "milyon TL",
+    "sutunlar": [
+      "TP",
+      "YP",
+      "Toplam"
+    ]
+  },
+  "15": {
+    "tablo": "Rasyolar",
+    "baslik": "Rasyolar",
+    "birim": null,
+    "sutunlar": [
+      "Rasyo"
+    ]
+  },
+  "16": {
+    "tablo": "Diğer Bilgiler",
+    "baslik": "Diğer Bilgiler",
+    "birim": null,
+    "sutunlar": [
+      "Adet"
+    ]
+  },
+  "17": {
+    "tablo": "Yurt Dışı Şube Rasyoları",
+    "baslik": "Yurt Dışı Şube Rasyoları",
+    "birim": null,
+    "sutunlar": [
+      "Rasyo"
+    ]
+  }
+}
