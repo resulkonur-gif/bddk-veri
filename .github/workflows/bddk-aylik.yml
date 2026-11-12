@@ -1,0 +1,55 @@
+name: BDDK Aylık Bülten
+
+on:
+  schedule:
+    # Her gün 09:41 (TR). Yeni dönem yoksa tek istekle biter.
+    - cron: "41 6 * * *"
+  workflow_dispatch:
+    inputs:
+      baslangic:
+        description: "Başlangıç dönemi (YYYY-MM). Boş bırakılırsa yalnızca yeni dönem kontrol edilir."
+        required: false
+      bitis:
+        description: "Bitiş dönemi (YYYY-MM)"
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bddk-aylik
+  cancel-in-progress: false
+
+jobs:
+  cek:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Veriyi çek
+        run: |
+          if [ -n "${{ inputs.baslangic }}" ] && [ -n "${{ inputs.bitis }}" ]; then
+            python scripts/bddk_aylik.py --baslangic "${{ inputs.baslangic }}" --bitis "${{ inputs.bitis }}"
+          else
+            python scripts/bddk_aylik.py --guncelle
+          fi
+
+      - name: Değişiklik varsa gönder
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add veri
+          if git diff --cached --quiet; then
+            echo "Değişiklik yok."
+          else
+            git commit -m "BDDK aylık veri: $(cat veri/aylik/son_donem.txt)"
+            git push
+          fi
