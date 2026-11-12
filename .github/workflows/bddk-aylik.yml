@@ -42,11 +42,17 @@ jobs:
             python scripts/bddk_aylik.py --guncelle
           fi
 
+      - name: Veri değiştiyse raporu üret
+        run: |
+          if [ -n "$(git status --porcelain veri)" ] || [ ! -f docs/index.html ]; then
+            python scripts/rapor_olustur.py
+          fi
+
       - name: Değişiklik varsa gönder
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add veri
+          git add veri docs
           if git diff --cached --quiet; then
             echo "Değişiklik yok."
           else

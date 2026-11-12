@@ -2,6 +2,12 @@
 
 BDDK'nın yayımladığı bankacılık sektörü verilerinin otomatik arşivi. Sitede "BDDK Verileri" sekmesinin kaynağıdır. TBB verilerinden ayrı tutulur.
 
+## Rapor (`docs/index.html`)
+
+Tek dosyalık etkileşimli rapor (TBB raporuyla aynı tasarım): özet göstergeler ve uzun dönem grafikleri, banka gruplarının karşılaştırması, bilanço yapısı ve 17 tablonun bütün kalemlerini gezme (gruplar yan yana / zaman serisi, kalem grafiği, CSV indirme). `scripts/rapor_olustur.py` veriden üretir; iş akışı veri değiştiğinde yeniden üretir.
+
+Rasyolar tablosundaki kâr, gelir ve gider içeren oranlar BDDK'da yıl başından birikimlidir; özet göstergelerde 12/ay ile yıllıklaştırılır.
+
 ## Aylık Bülten (`veri/aylik/`)
 
 Kaynak: [BDDK İnteraktif Aylık Bülten](https://www.bddk.org.tr/BultenAylik), Excel dışa aktarımı (3 ondalık).
