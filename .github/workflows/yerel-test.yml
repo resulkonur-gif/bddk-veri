@@ -9,17 +9,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.13"}
-      - name: ilk indirme (2026-08 aylik, 2026 haftalik yalniz tablo 1)
+      - name: haftalik + aylik + raporlar
         shell: bash
         run: |
-          python -I yerel/bddk_indir.py aylik --baslangic 2026-08 --bitis 2026-08 | grep -vE " tamam$"
-          python -I yerel/bddk_indir.py haftalik --baslangic 2026 --bitis 2026 --tablolar 1
-      - name: guncelle (yalniz eksikler inmeli)
-        shell: bash
-        run: python -I yerel/bddk_indir.py guncelle
-      - name: tekrar guncelle (is olmamali)
-        shell: bash
-        run: printf "1\n\n" | python -I yerel/bddk_indir.py
-      - name: kontrol
-        shell: bash
-        run: ls yerel/BDDK_Veri yerel/BDDK_Veri/aylik yerel/BDDK_Veri/haftalik; cat yerel/BDDK_Veri/eksikler.txt 2>/dev/null || echo "eksikler.txt yok"
+          python -I yerel/bddk_indir.py haftalik --baslangic 2026 --bitis 2026 | grep -vE "satır$"
+          python -I yerel/bddk_indir.py aylik | grep -vE " tamam$"
+          printf "6\n\n" | python -I yerel/bddk_indir.py | tail -6
+          ls -la yerel/BDDK_Veri
+          grep -c "Chart.js v4.4.1" yerel/BDDK_Veri/BDDK_Haftalik_Rapor.html
+          grep -o 'href="BDDK_[A-Za-z_]*.html"' yerel/BDDK_Veri/*.html | sort -u
