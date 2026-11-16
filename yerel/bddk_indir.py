@@ -218,6 +218,17 @@ def sayi(x):
             return None
 
 
+def tr_sayi(s):
+    """BDDK HTML tablosundaki Türkçe biçimli sayı: '18.523.337,65624' ya da '993.454' (=993454)."""
+    s = s.strip()
+    if s in ("", "-"):
+        return None
+    try:
+        return float(s.replace(".", "").replace(",", "."))
+    except ValueError:
+        return None
+
+
 def csv_oku(yol):
     if not yol.exists():
         return []
@@ -464,7 +475,7 @@ def haftalik_ayristir(sayfa, tablo_no, tablo_ad, kalemler):
                 continue
             k = sonuc.setdefault((t, grup, sira), {"tarih": t, "tablo_no": tablo_no, "tablo": tablo_ad,
                                                     "grup": grup, "sira": sira, "kalem": kad})
-            k[sut] = sayi(deg) if deg.strip() not in ("", "-") else None
+            k[sut] = tr_sayi(deg)
     return [k for k in sonuc.values() if any(k.get(s) is not None for s in SUTUNLAR)]
 
 
