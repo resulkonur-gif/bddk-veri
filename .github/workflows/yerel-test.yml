@@ -1,0 +1,40 @@
+name: yerel betik testi
+on:
+  push:
+    branches: [yerel-test]
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install requests pandas openpyxl
+      - name: aylik
+        shell: bash
+        run: |
+          python yerel/bddk_indir.py aylik --tablolar 1,15
+          python yerel/bddk_indir.py aylik --baslangic 2026-08 --bitis 2026-09 --tablolar 1,3
+      - name: haftalik
+        shell: bash
+        run: python yerel/bddk_indir.py haftalik --baslangic 2026 --bitis 2026 --tablolar 1,9
+      - name: menu
+        shell: bash
+        run: printf "1\n\n" | python yerel/bddk_indir.py | tail -8
+      - name: kontrol
+        shell: bash
+        run: |
+          ls -la yerel/BDDK_Veri/aylik yerel/BDDK_Veri/haftalik
+          python -c "
+          import pandas as pd
+          a=pd.read_csv('yerel/BDDK_Veri/aylik/bddk_aylik_2026.csv',encoding='utf-8-sig',dtype={'donem':str})
+          print('AYLIK', a.donem.unique(), a.tablo_no.unique(), a.grup.nunique(), len(a))
+          print(a[(a.donem=='2026-09')&(a.grup=='Sektör')&(a.kalem=='TOPLAM AKTİFLER')].to_string())
+          h=pd.read_csv('yerel/BDDK_Veri/haftalik/bddk_haftalik_2026.csv',encoding='utf-8-sig',dtype={'tarih':str})
+          print('HAFTALIK', h.tarih.nunique(), h.tablo_no.unique(), h.grup.nunique(), len(h))
+          print(h[(h.tarih==h.tarih.max())&(h.grup=='Sektör')&(h.tablo_no==1)].head(4).to_string())
+          print(h[(h.tarih==h.tarih.max())&(h.grup=='Sektör')&(h.tablo_no==9)].head(3).to_string())
+          "
