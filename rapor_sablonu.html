@@ -663,7 +663,7 @@ async function load(){
   D.np=D.per.length; D.ng=D.grp.length;
   for(const t of D.tab){t.nc=t.cols.length;t.ni=t.items.length;t.idx={};t.items.forEach((it,i)=>t.idx[it.ad]=i);T[t.no]=t;}
   D.gi={};D.grp.forEach((g,i)=>D.gi[g]=i);
-  S.p=D.np-1; S.g=D.gi["Sektör"]??0; S.xg=S.g;
+  S.p=D.np-1; S.g=D.gi["Sektör"]??0; S.xg=S.g; if(!T[S.xt])S.xt=D.tab[0].no;
   DEFAULT_ON.forEach(n=>{if(n in D.gi)S.kg.add(D.gi[n])});
 }
 const val=(t,i,c,g,p)=>{if(i==null||c<0||p<0)return null;const v=t.v[((i*t.nc+c)*D.ng+g)*D.np+p];return v==null?null:v};
