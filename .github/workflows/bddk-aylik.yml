@@ -17,7 +17,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: bddk-aylik
+  group: bddk-yazma
   cancel-in-progress: false
 
 jobs:
@@ -57,5 +57,6 @@ jobs:
             echo "Değişiklik yok."
           else
             git commit -m "BDDK aylık veri: $(cat veri/aylik/son_donem.txt)"
+            git pull --rebase origin main
             git push
           fi
