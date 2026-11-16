@@ -12,6 +12,11 @@ Kullanım:
     python bddk_indir.py haftalik --baslangic 2014 --bitis 2026
     python bddk_indir.py haftalik --baslangic 2026 --bitis 2026 --tablolar 1,4
     python bddk_indir.py rapor                             # indirilmiş aylık verilerden HTML rapor
+    python bddk_indir.py guncelle                          # yalnız yeni/eksik dönemleri indir, çıktıları güncelle
+    python bddk_indir.py guncelle --sadece aylik
+
+Hata veren istekler en sonda 10, 30 ve 60 sn arayla yeniden denenir. Yine de inmeyenler
+BDDK_Veri/eksikler.txt dosyasına yazılır; 'guncelle' bir sonraki çalıştırmada onları da tamamlar.
 
 Çıktılar (betiğin yanında; --klasor ile değiştirilebilir):
     BDDK_Veri/aylik/bddk_aylik_<yıl>.csv        donem,tablo_no,tablo,grup,sira,kalem,sutun,deger
@@ -77,6 +82,58 @@ class Http:
         req = urllib.request.Request(url, data=body, headers={"Content-Type": "application/x-www-form-urlencoded"})
         with self.op.open(req, timeout=timeout) as r:
             return r.status, r.read()
+
+
+# =====================================================================================
+# İş yürütücü: hata verenleri en sonda yeniden dener
+# =====================================================================================
+TEKRAR_BEKLEME = [10, 30, 60]  # saniye; her tekrar turundan önce
+
+
+def _kisa(e):
+    m = str(e).strip().splitlines()
+    return (type(e).__name__ + (": " + m[0] if m else ""))[:120]
+
+
+def isleri_calistir(isler, fonk, paralel, etiket, klasor=None, tur_adi=""):
+    """isler: argüman demetleri. fonk(*is) bir sonuç döndürür.
+    Önce paralel çalıştırır; hata verenleri sona bırakıp TEKRAR_BEKLEME sırasıyla tek tek yeniden dener.
+    (sonuçlar, hâlâ başarısız olan işler) döndürür; kalanları klasör/eksikler.txt dosyasına yazar."""
+    sonuc, kalan = [], list(isler)
+    for tur in range(len(TEKRAR_BEKLEME) + 1):
+        if tur:
+            bekle = TEKRAR_BEKLEME[tur - 1]
+            print(f"\n  {len(kalan)} iş başarısız oldu; {bekle} sn sonra yeniden deneniyor "
+                  f"(tekrar {tur}/{len(TEKRAR_BEKLEME)}, tek tek)...", flush=True)
+            time.sleep(bekle)
+        hatali = []
+        with ThreadPoolExecutor(paralel if tur == 0 else 1) as ex:
+            fs = {ex.submit(fonk, *i): i for i in kalan}
+            for f in as_completed(fs):
+                i = fs[f]
+                try:
+                    r = f.result()
+                    sonuc.append(r)
+                    print(f"  {etiket(i, r)}", flush=True)
+                except Exception as e:  # ağ, zaman aşımı, bozuk yanıt...
+                    hatali.append(i)
+                    print(f"  {etiket(i, None)} HATA ({_kisa(e)})", flush=True)
+        kalan = hatali
+        if not kalan:
+            break
+    if klasor is not None:
+        yol = klasor / "eksikler.txt"
+        eski = [x for x in (yol.read_text("utf-8").splitlines() if yol.exists() else []) if not x.startswith(tur_adi + " ")]
+        yeni = [f"{tur_adi} {etiket(i, None)}" for i in kalan]
+        if eski or yeni:
+            klasor.mkdir(parents=True, exist_ok=True)
+            yol.write_text("\n".join(eski + yeni) + "\n", "utf-8")
+        elif yol.exists():
+            yol.unlink()
+    if kalan:
+        print(f"\n  UYARI: {len(kalan)} iş tüm denemelere rağmen inmedi; listesi eksikler.txt dosyasında. "
+              f"Daha sonra 'güncelle' çalıştırınca yeniden denenir.", flush=True)
+    return sonuc, kalan
 
 
 # =====================================================================================
@@ -273,8 +330,8 @@ def aylik_indir(tablo_no, yil, ay, para="TL", deneme=4):
                 satirlar = xlsx_oku(icerik)
                 return satirlar[0], [x for x in satirlar[1:] if x and x[0]]
             hata = f"HTTP {st}"
-        except (urllib.error.URLError, OSError, zipfile.BadZipFile) as e:
-            hata = str(e)
+        except Exception as e:  # bağlantı kopması, zaman aşımı, bozuk dosya...
+            hata = _kisa(e)
         time.sleep(2 * (k + 1))
     raise RuntimeError(f"Aylık tablo {tablo_no} {yil}/{ay}: {hata}")
 
@@ -297,16 +354,19 @@ def aylik_son_donem():
     raise RuntimeError("Son aylık dönem bulunamadı (bağlantıyı kontrol edin).")
 
 
-def aylik_donem(yil, ay, tablolar, para):
+def aylik_tablo(yil, ay, t, para):
+    baslik, satirlar = aylik_indir(t, yil, ay, para)
+    if f"Dönem:{yil}/{ay}" not in str(baslik[2]) and t not in (15, 16, 17):
+        raise RuntimeError(f"{yil}/{ay} dönemi yayımlanmamış görünüyor")
+    sutunlar = [str(c) for c in baslik[3:] if c not in (None, "")]
     kayit = []
-    for t in tablolar:
-        baslik, satirlar = aylik_indir(t, yil, ay, para)
-        sutunlar = [str(c) for c in baslik[3:] if c not in (None, "")]
-        for r in satirlar:
-            for j, s in enumerate(sutunlar):
-                kayit.append({"donem": f"{yil}-{ay:02d}", "tablo_no": t, "tablo": AYLIK_TABLOLAR[t],
-                              "grup": str(r[0]).strip(), "sira": int(float(r[1])), "kalem": str(r[2]).strip(),
-                              "sutun": s, "deger": sayi(r[3 + j] if 3 + j < len(r) else None)})
+    for r in satirlar:
+        for j, s in enumerate(sutunlar):
+            kayit.append({"donem": f"{yil}-{ay:02d}", "tablo_no": t, "tablo": AYLIK_TABLOLAR[t],
+                          "grup": str(r[0]).strip(), "sira": int(float(r[1])), "kalem": str(r[2]).strip(),
+                          "sutun": s, "deger": sayi(r[3 + j] if 3 + j < len(r) else None)})
+    if not kayit:
+        raise RuntimeError("boş tablo")
     return kayit
 
 
@@ -339,31 +399,70 @@ def aylik_kaydet(kayitlar, klasor, para):
         print(f"  Kaydedildi: {yol.name} ve BDDK_Aylik_{yil}{ek}.xlsx")
 
 
+def aylik_mevcut(klasor, para="TL"):
+    """Klasörde zaten bulunan (dönem, tablo) çiftleri."""
+    ek = "" if para == "TL" else f"_{para}"
+    mevcut = set()
+    for f in sorted((klasor / "aylik").glob(f"bddk_aylik_[0-9][0-9][0-9][0-9]{ek}.csv")):
+        with open(f, encoding="utf-8-sig", newline="") as fh:
+            for r in csv.DictReader(fh):
+                mevcut.add((r["donem"], int(r["tablo_no"])))
+    return mevcut
+
+
+def aylik_isleri_yap(isler, para, klasor, paralel):
+    """isler: [(yil, ay, tablo)] -> indir, tekrar dene, kaydet, raporu güncelle."""
+    if not isler:
+        return
+    print(f"Aylık bülten: {len({(y, a) for y, a, _ in isler})} dönem, {len(isler)} tablo indirilecek ({para})...")
+    sonuclar, _ = isleri_calistir(
+        isler, lambda y, a, t: aylik_tablo(y, a, t, para), paralel,
+        lambda i, r: f"{i[0]}-{i[1]:02d} {AYLIK_TABLOLAR[i[2]]}" + ("" if r is None else " tamam"),
+        klasor, "aylik")
+    kayitlar = [k for r in sonuclar for k in r]
+    if kayitlar:
+        aylik_kaydet(kayitlar, klasor / "aylik", para)
+        if para == "TL":
+            rapor_olustur(klasor)
+
+
+def donem_listesi(bas, bit):
+    out, (y, a) = [], bas
+    while (y, a) <= bit:
+        out.append((y, a))
+        y, a = (y + 1, 1) if a == 12 else (y, a + 1)
+    return out
+
+
 def aylik_calistir(baslangic, bitis, tablolar, para, klasor, paralel):
     if not bitis:
         print("En son yayımlanan ay aranıyor...")
         bitis = aylik_son_donem()
         print(f"  Yayımlanmış en son dönem: {bitis[0]}-{bitis[1]:02d}")
     baslangic = baslangic or bitis
-    donemler, (y, a) = [], baslangic
-    while (y, a) <= bitis:
-        donemler.append((y, a))
-        y, a = (y + 1, 1) if a == 12 else (y, a + 1)
-    print(f"Aylık bülten: {len(donemler)} dönem × {len(tablolar)} tablo × 10 grup indiriliyor ({para})...")
-    kayitlar = []
-    with ThreadPoolExecutor(paralel) as ex:
-        fs = {ex.submit(aylik_donem, y, a, tablolar, para): (y, a) for y, a in donemler}
-        for f in as_completed(fs):
-            y, a = fs[f]
-            try:
-                kayitlar += f.result()
-                print(f"  {y}-{a:02d} tamam")
-            except RuntimeError as e:
-                print(f"  {y}-{a:02d} ATLANDI: {e}")
-    if kayitlar:
-        aylik_kaydet(kayitlar, klasor / "aylik", para)
-        if para == "TL":
-            rapor_olustur(klasor)
+    isler = [(y, a, t) for y, a in donem_listesi(baslangic, bitis) for t in tablolar]
+    aylik_isleri_yap(isler, para, klasor, paralel)
+
+
+def aylik_guncelle(klasor, paralel, para="TL"):
+    """Yalnız eksik ve yeni yayımlanmış dönem/tabloları indirir."""
+    print("Aylık bülten: mevcut veriler kontrol ediliyor...")
+    mevcut = aylik_mevcut(klasor, para)
+    son = aylik_son_donem()
+    if mevcut:
+        bas = tuple(map(int, min(d for d, _ in mevcut).split("-")))
+        print(f"  Klasörde: {len({d for d, _ in mevcut})} dönem ({min(d for d, _ in mevcut)} – "
+              f"{max(d for d, _ in mevcut)}); yayımlanmış en son: {son[0]}-{son[1]:02d}")
+    else:
+        bas = son
+        print(f"  Klasörde aylık veri yok; yalnız en son dönem ({son[0]}-{son[1]:02d}) indirilecek. "
+              f"Geçmiş için 'dönem aralığı' seçeneğini kullanın.")
+    isler = [(y, a, t) for y, a in donem_listesi(bas, son) for t in AYLIK_TABLOLAR
+             if (f"{y}-{a:02d}", t) not in mevcut]
+    if not isler:
+        print("  Aylık bülten güncel; eksik ya da yeni dönem yok.")
+        return
+    aylik_isleri_yap(isler, para, klasor, paralel)
 
 
 # =====================================================================================
@@ -427,12 +526,12 @@ class HaftalikOturum:
                 if st == 200 and 'id="TabloExcelGelismis2"' in s:
                     return s
                 hata = f"HTTP {st}"
-            except (urllib.error.URLError, OSError) as e:
-                hata = str(e)
+            except Exception as e:
+                hata = _kisa(e)
             time.sleep(3 * (k + 1))
             try:
                 self.yenile()
-            except (urllib.error.URLError, OSError, AttributeError):
+            except Exception:
                 pass
         raise RuntimeError(f"Haftalık {bas[:10]}–{bit[:10]}: {hata}")
 
@@ -508,7 +607,45 @@ def haftalik_kaydet(kayitlar, klasor):
         print(f"  Kaydedildi: {yol.name} ve BDDK_Haftalik_{yil}.xlsx")
 
 
-def haftalik_calistir(bas_yil, bit_yil, tablo_sec, klasor, paralel):
+def haftalik_mevcut(klasor):
+    mevcut = set()
+    for f in sorted((klasor / "haftalik").glob("bddk_haftalik_[0-9][0-9][0-9][0-9].csv")):
+        with open(f, encoding="utf-8-sig", newline="") as fh:
+            for r in csv.DictReader(fh):
+                mevcut.add((r["tarih"], int(r["tablo_no"])))
+    return mevcut
+
+
+def haftalik_isleri_yap(o, tablolar, isler, klasor, paralel):
+    """isler: [(yil, baslangic_form_degeri, bitis_form_degeri, tablo_no)]"""
+    if not isler:
+        return
+    print(f"Haftalık bülten: {len(isler)} istek (yıl × tablo) indirilecek...")
+    yerel = threading.local()
+
+    def is_yap(y, b, e, n):
+        if not hasattr(yerel, "o"):
+            yerel.o = HaftalikOturum()
+        t = tablolar[n]
+        s = yerel.o.rapor(b, e, [i for i, _ in t["kalemler"]])
+        try:
+            return haftalik_ayristir(s, n, t["ad"], t["kalemler"])
+        except Exception:
+            yerel.o = HaftalikOturum()  # bir sonraki deneme yeni oturumla
+            raise
+
+    def etiket(i, r):
+        y, b, e, n = i
+        ad = f"{_tarih(b)}–{_tarih(e)} {tablolar[n]['ad']}"
+        return ad if r is None else f"{ad}: {len(r):,} satır"
+
+    sonuclar, _ = isleri_calistir(isler, is_yap, paralel, etiket, klasor, "haftalik")
+    kayitlar = [k for r in sonuclar for k in r]
+    if kayitlar:
+        haftalik_kaydet(kayitlar, klasor / "haftalik")
+
+
+def _haftalik_hazirla(tablo_sec=None):
     print("Haftalık bülten sayfası açılıyor...")
     o = HaftalikOturum()
     tablolar = o.tablolar()
@@ -517,6 +654,11 @@ def haftalik_calistir(bas_yil, bit_yil, tablo_sec, klasor, paralel):
           f"{len(tarihler)} hafta ({_tarih(tarihler[0])} – {_tarih(tarihler[-1])})")
     if tablo_sec:
         tablolar = {n: t for n, t in tablolar.items() if n in tablo_sec}
+    return o, tablolar, tarihler
+
+
+def haftalik_calistir(bas_yil, bit_yil, tablo_sec, klasor, paralel):
+    o, tablolar, tarihler = _haftalik_hazirla(tablo_sec)
     bas_yil = bas_yil or _tarih(tarihler[-1]).year
     bit_yil = bit_yil or _tarih(tarihler[-1]).year
     isler = []
@@ -524,35 +666,31 @@ def haftalik_calistir(bas_yil, bit_yil, tablo_sec, klasor, paralel):
         t = [x for x in tarihler if _tarih(x).year == y]
         if t:
             isler += [(y, t[0], t[-1], n) for n in tablolar]
-    print(f"Haftalık bülten: {bas_yil}–{bit_yil}, {len(tablolar)} tablo × 10 grup ({len(isler)} istek)...")
-    yerel = threading.local()
+    haftalik_isleri_yap(o, tablolar, isler, klasor, paralel)
 
-    def is_yap(y, b, e, n):
-        if not hasattr(yerel, "o"):
-            yerel.o = HaftalikOturum()
-        t = tablolar[n]
-        for k in range(3):
-            s = yerel.o.rapor(b, e, [i for i, _ in t["kalemler"]])
-            try:
-                return y, n, haftalik_ayristir(s, n, t["ad"], t["kalemler"])
-            except (RuntimeError, AttributeError, IndexError):
-                if k == 2:
-                    raise RuntimeError(f"{y} {t['ad']}: tablo okunamadı")
-                time.sleep(5)
-                yerel.o = HaftalikOturum()
 
-    kayitlar = []
-    with ThreadPoolExecutor(paralel) as ex:
-        fs = [ex.submit(is_yap, *i) for i in isler]
-        for f in as_completed(fs):
-            try:
-                y, n, k = f.result()
-                kayitlar += k
-                print(f"  {y} · {tablolar[n]['ad']}: {len(k):,} satır")
-            except RuntimeError as e:
-                print(f"  ATLANDI: {e}")
-    if kayitlar:
-        haftalik_kaydet(kayitlar, klasor / "haftalik")
+def haftalik_guncelle(klasor, paralel):
+    """Yalnız eksik ve yeni yayımlanmış hafta/tabloları indirir."""
+    mevcut = haftalik_mevcut(klasor)
+    o, tablolar, tarihler = _haftalik_hazirla()
+    son = _tarih(tarihler[-1])
+    if mevcut:
+        ilk = min(t for t, _ in mevcut)
+        print(f"  Klasörde: {len({t for t, _ in mevcut})} hafta ({ilk} – {max(t for t, _ in mevcut)}); "
+              f"yayımlanmış en son: {son}")
+    else:
+        ilk = date(son.year, 1, 1).isoformat()
+        print(f"  Klasörde haftalık veri yok; {son.year} yılı indirilecek. Geçmiş için 'yıl aralığı' seçeneğini kullanın.")
+    isler = []
+    for n in tablolar:
+        eksik = [x for x in tarihler if _tarih(x).isoformat() >= ilk and (_tarih(x).isoformat(), n) not in mevcut]
+        for y in sorted({_tarih(x).year for x in eksik}):
+            ey = [x for x in eksik if _tarih(x).year == y]
+            isler.append((y, ey[0], ey[-1], n))
+    if not isler:
+        print("  Haftalık bülten güncel; eksik ya da yeni hafta yok.")
+        return
+    haftalik_isleri_yap(o, tablolar, isler, klasor, paralel)
 
 
 # =====================================================================================
@@ -728,25 +866,30 @@ def tablo_oku(s):
 
 def menu(klasor):
     print("BDDK veri indirici\n")
-    print("  1) Aylık bülten  – en son yayımlanan ay")
-    print("  2) Aylık bülten  – dönem aralığı")
-    print("  3) Haftalık bülten – bu yıl")
-    print("  4) Haftalık bülten – yıl aralığı")
-    print("  5) HTML raporu yeniden oluştur (indirilmiş aylık verilerden)")
-    sec = input("\nSeçiminiz (1-5): ").strip()
+    print("  1) GÜNCELLE – yalnız yeni ve eksik dönemleri indir (aylık + haftalık), raporu yenile")
+    print("  2) Aylık bülten  – en son yayımlanan ay")
+    print("  3) Aylık bülten  – dönem aralığı")
+    print("  4) Haftalık bülten – bu yıl")
+    print("  5) Haftalık bülten – yıl aralığı")
+    print("  6) HTML raporu yeniden oluştur (indirilmiş aylık verilerden)")
+    sec = input("\nSeçiminiz (1-6): ").strip()
     if sec == "1":
-        aylik_calistir(None, None, list(AYLIK_TABLOLAR), "TL", klasor, 3)
+        aylik_guncelle(klasor, 3)
+        print()
+        haftalik_guncelle(klasor, 3)
     elif sec == "2":
+        aylik_calistir(None, None, list(AYLIK_TABLOLAR), "TL", klasor, 3)
+    elif sec == "3":
         b = ay_oku(input("Başlangıç (YYYY-AA, ör. 2018-01): "))
         e = ay_oku(input("Bitiş     (YYYY-AA, ör. 2026-09): "))
         aylik_calistir(b, e, list(AYLIK_TABLOLAR), "TL", klasor, 3)
-    elif sec == "3":
-        haftalik_calistir(None, None, None, klasor, 3)
     elif sec == "4":
+        haftalik_calistir(None, None, None, klasor, 3)
+    elif sec == "5":
         b = int(input("Başlangıç yılı (en erken 2014): ").strip())
         e = int(input("Bitiş yılı: ").strip())
         haftalik_calistir(b, e, None, klasor, 3)
-    elif sec == "5":
+    elif sec == "6":
         rapor_olustur(klasor)
     else:
         print("Geçersiz seçim.")
@@ -780,10 +923,18 @@ def main():
     h.add_argument("--bitis", type=int, help="bitiş yılı (boşsa bu yıl)")
     h.add_argument("--tablolar", help="ör. 1,4 (boşsa 9 tablonun hepsi)")
     alt.add_parser("rapor", help="indirilmiş aylık verilerden HTML raporu oluşturur")
+    gu = alt.add_parser("guncelle", help="yalnız yeni ve eksik dönemleri indirir, çıktıları ve raporu günceller")
+    gu.add_argument("--sadece", choices=["aylik", "haftalik"], help="yalnız birini güncelle")
     g = ap.parse_args()
     klasor = Path(g.klasor)
     if g.tur == "rapor":
         rapor_olustur(klasor)
+    elif g.tur == "guncelle":
+        if g.sadece != "haftalik":
+            aylik_guncelle(klasor, g.paralel)
+        if g.sadece != "aylik":
+            print()
+            haftalik_guncelle(klasor, g.paralel)
     elif g.tur == "aylik":
         aylik_calistir(ay_oku(g.baslangic) if g.baslangic else None, ay_oku(g.bitis) if g.bitis else None,
                        tablo_oku(g.tablolar) or list(AYLIK_TABLOLAR), g.para, klasor, g.paralel)
