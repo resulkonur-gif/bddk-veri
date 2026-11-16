@@ -1,0 +1,1061 @@
+{
+  "1": {
+    "bddk_id": 289,
+    "ad": "Krediler",
+    "kalemler": [
+      {
+        "id": 5687,
+        "sira": 1,
+        "ad": "Toplam Krediler (2+10)"
+      },
+      {
+        "id": 5688,
+        "sira": 2,
+        "ad": "Tüketici Kredileri ve Bireysel Kredi Kartları (3+7)"
+      },
+      {
+        "id": 5689,
+        "sira": 3,
+        "ad": "Tüketici Kredileri (4+5+6)"
+      },
+      {
+        "id": 5690,
+        "sira": 4,
+        "ad": "a) Konut"
+      },
+      {
+        "id": 5691,
+        "sira": 5,
+        "ad": "b) Taşıt"
+      },
+      {
+        "id": 5692,
+        "sira": 6,
+        "ad": "c) İhtiyaç"
+      },
+      {
+        "id": 5694,
+        "sira": 7,
+        "ad": "Bireysel Kredi Kartları (8+9)"
+      },
+      {
+        "id": 5695,
+        "sira": 8,
+        "ad": "a) Taksitli"
+      },
+      {
+        "id": 5696,
+        "sira": 9,
+        "ad": "b) Taksitsiz"
+      },
+      {
+        "id": 5698,
+        "sira": 10,
+        "ad": "Ticari ve Diğer Krediler"
+      },
+      {
+        "id": 5699,
+        "sira": 11,
+        "ad": "Taksitli Tic. Krd. ve Kurumsal Kredi Kartları (12+16) (Bilgi)"
+      },
+      {
+        "id": 5700,
+        "sira": 12,
+        "ad": "Taksitli Ticari Krediler (13+14+15) (Bilgi)"
+      },
+      {
+        "id": 5701,
+        "sira": 13,
+        "ad": "a) İşyeri"
+      },
+      {
+        "id": 5702,
+        "sira": 14,
+        "ad": "b) Taşıt"
+      },
+      {
+        "id": 5703,
+        "sira": 15,
+        "ad": "c) İhtiyaç"
+      },
+      {
+        "id": 5705,
+        "sira": 16,
+        "ad": "Kurumsal Kredi Kartları (17+18) (Bilgi)"
+      },
+      {
+        "id": 5706,
+        "sira": 17,
+        "ad": "a) Taksitli"
+      },
+      {
+        "id": 5707,
+        "sira": 18,
+        "ad": "b) Taksitsiz"
+      },
+      {
+        "id": 5697,
+        "sira": 19,
+        "ad": "KOBİ Kredileri (Bilgi)"
+      },
+      {
+        "id": 5708,
+        "sira": 20,
+        "ad": "Döv. Endeksli Krediler (Bilgi)"
+      },
+      {
+        "id": 5882,
+        "sira": 21,
+        "ad": "Kredili Mevduat Hesapları-Tüketici Kredileri (Bilgi)"
+      },
+      {
+        "id": 5883,
+        "sira": 22,
+        "ad": "Kredili Mevduat Hesapları-Taksitli Ticari Krediler(Bilgi)"
+      },
+      {
+        "id": 5693,
+        "sira": 23,
+        "ad": "d) Diğer"
+      },
+      {
+        "id": 5704,
+        "sira": 24,
+        "ad": "d) Diğer"
+      }
+    ]
+  },
+  "2": {
+    "bddk_id": 290,
+    "ad": "Takipteki Alacaklar",
+    "kalemler": [
+      {
+        "id": 5709,
+        "sira": 1,
+        "ad": "Takipteki Alacaklar (2+8)"
+      },
+      {
+        "id": 5866,
+        "sira": 2,
+        "ad": "Tüketici Kredileri ve Bireysel Kredi Kartları (3+7)"
+      },
+      {
+        "id": 5710,
+        "sira": 3,
+        "ad": "Tüketici Kredileri (4+5+6)"
+      },
+      {
+        "id": 5867,
+        "sira": 4,
+        "ad": "a) Konut"
+      },
+      {
+        "id": 5868,
+        "sira": 5,
+        "ad": "b) Taşıt"
+      },
+      {
+        "id": 5869,
+        "sira": 6,
+        "ad": "c) İhtiyaç"
+      },
+      {
+        "id": 5711,
+        "sira": 7,
+        "ad": "Bireysel Kredi Kartları"
+      },
+      {
+        "id": 5713,
+        "sira": 8,
+        "ad": "Ticari ve Diğer Krediler"
+      },
+      {
+        "id": 5714,
+        "sira": 9,
+        "ad": "Takipteki Alacaklar Özel Karşılığı (-)"
+      },
+      {
+        "id": 5715,
+        "sira": 10,
+        "ad": "Taksitli Ticari Krd. (Bilgi)"
+      },
+      {
+        "id": 5716,
+        "sira": 11,
+        "ad": "Kurumsal Kredi Kartları (Bilgi)"
+      },
+      {
+        "id": 5712,
+        "sira": 12,
+        "ad": "KOBİ Kredileri (Bilgi)"
+      },
+      {
+        "id": 5871,
+        "sira": 13,
+        "ad": "d) Diğer"
+      }
+    ]
+  },
+  "3": {
+    "bddk_id": 291,
+    "ad": "Menkul Değerler",
+    "kalemler": [
+      {
+        "id": 5717,
+        "sira": 1,
+        "ad": "Toplam Menkul Değerler (2+5+8)"
+      },
+      {
+        "id": 5873,
+        "sira": 2,
+        "ad": "Gerçeğe Uygun Değer Farkı K/Z Yan. Menk. Değ."
+      },
+      {
+        "id": 5874,
+        "sira": 3,
+        "ad": "- Devlet Tahvilleri (Bilgi için)"
+      },
+      {
+        "id": 5875,
+        "sira": 4,
+        "ad": "- Kira Sertifikaları (Bilgi için)"
+      },
+      {
+        "id": 5880,
+        "sira": 5,
+        "ad": "GUD Farkı Diğer Kapsamlı Gelire Yan. Menk. Değ."
+      },
+      {
+        "id": 5876,
+        "sira": 6,
+        "ad": "- Devlet Tahvilleri (Bilgi için)"
+      },
+      {
+        "id": 5881,
+        "sira": 7,
+        "ad": "- Kira Sertifikaları (Bilgi için)"
+      },
+      {
+        "id": 5877,
+        "sira": 8,
+        "ad": "İtfa Edilmiş Maliyeti Üzerinden Değerlenen Menkul Değerler"
+      },
+      {
+        "id": 5878,
+        "sira": 9,
+        "ad": "- Devlet Tahvilleri (Bilgi için)"
+      },
+      {
+        "id": 5879,
+        "sira": 10,
+        "ad": "- Kira Sertifikaları (Bilgi için)"
+      },
+      {
+        "id": 5727,
+        "sira": 11,
+        "ad": "Repo İşlemine Konu Menkul Değerler (Bilgi)"
+      },
+      {
+        "id": 5728,
+        "sira": 12,
+        "ad": "Teminata Verilen Menkul Değerler (Bilgi)"
+      },
+      {
+        "id": 5729,
+        "sira": 13,
+        "ad": "Eurobondlar (Bilgi)"
+      },
+      {
+        "id": 5718,
+        "sira": 14,
+        "ad": "Gerçeğe Uygun Değer Farkı K/Z Yan. Menk. Değ. (3+4)"
+      },
+      {
+        "id": 5719,
+        "sira": 15,
+        "ad": "a) Kamu Borçlanma Senetleri"
+      },
+      {
+        "id": 5720,
+        "sira": 16,
+        "ad": "b) Diğer Menkul Değerler"
+      },
+      {
+        "id": 5721,
+        "sira": 17,
+        "ad": "GUD Farkı Diğer Kapsamlı Gelire Yan. Menk. Değ. (6+7)"
+      },
+      {
+        "id": 5722,
+        "sira": 18,
+        "ad": "a) Kamu Borçlanma Senetleri"
+      },
+      {
+        "id": 5723,
+        "sira": 19,
+        "ad": "b) Diğer Menkul Değerler"
+      },
+      {
+        "id": 5724,
+        "sira": 20,
+        "ad": "İtfa Edilmiş Maliyeti Üzerinden Değerlenen Menkul Değerler (9+10)"
+      },
+      {
+        "id": 5725,
+        "sira": 21,
+        "ad": "a) Kamu Borçlanma Senetleri"
+      },
+      {
+        "id": 5726,
+        "sira": 22,
+        "ad": "b) Diğer Menkul Değerler"
+      }
+    ]
+  },
+  "4": {
+    "bddk_id": 292,
+    "ad": "Mevduat",
+    "kalemler": [
+      {
+        "id": 5730,
+        "sira": 1,
+        "ad": "Mevduat (Katılım Fonu) (2+5+8)"
+      },
+      {
+        "id": 5731,
+        "sira": 2,
+        "ad": "Gerçek Kişiler (3+4)"
+      },
+      {
+        "id": 5732,
+        "sira": 3,
+        "ad": "a) Vadesiz"
+      },
+      {
+        "id": 5733,
+        "sira": 4,
+        "ad": "b) Vadeli"
+      },
+      {
+        "id": 5734,
+        "sira": 5,
+        "ad": "Ticari Kuruluşlar (6+7)"
+      },
+      {
+        "id": 5735,
+        "sira": 6,
+        "ad": "a) Vadesiz"
+      },
+      {
+        "id": 5736,
+        "sira": 7,
+        "ad": "b) Vadeli"
+      },
+      {
+        "id": 5737,
+        "sira": 8,
+        "ad": "Resmi ve Diğer Kuruluşlar (9+10)"
+      },
+      {
+        "id": 5738,
+        "sira": 9,
+        "ad": "a) Vadesiz"
+      },
+      {
+        "id": 5739,
+        "sira": 10,
+        "ad": "b) Vadeli"
+      },
+      {
+        "id": 5740,
+        "sira": 11,
+        "ad": "Sigortaya Tabi Mevduat (Bilgi)"
+      },
+      {
+        "id": 5872,
+        "sira": 12,
+        "ad": "Kur Korumalı TL Mevduat ve Katılma Hesapları (Bilgi için)"
+      }
+    ]
+  },
+  "5": {
+    "bddk_id": 293,
+    "ad": "Diğer Bilanço Kalemleri",
+    "kalemler": [
+      {
+        "id": 5741,
+        "sira": 1,
+        "ad": "Nakit Değerler"
+      },
+      {
+        "id": 5742,
+        "sira": 2,
+        "ad": "T.C. Merkez Bankasından Alacaklar"
+      },
+      {
+        "id": 5743,
+        "sira": 3,
+        "ad": "Para Piyasalarından Alacaklar"
+      },
+      {
+        "id": 5744,
+        "sira": 4,
+        "ad": "Zorunlu Karşılıklar"
+      },
+      {
+        "id": 5745,
+        "sira": 5,
+        "ad": "Bankalardan Alacaklar (5+6)"
+      },
+      {
+        "id": 5746,
+        "sira": 6,
+        "ad": "a) Yurtiçi Bankalar"
+      },
+      {
+        "id": 5747,
+        "sira": 7,
+        "ad": "b) Yurtdışı Bankalar"
+      },
+      {
+        "id": 5748,
+        "sira": 8,
+        "ad": "T.C. Merkez Bankasına Borçlar"
+      },
+      {
+        "id": 5849,
+        "sira": 9,
+        "ad": "Para Piyasalarına Borçlar"
+      },
+      {
+        "id": 5749,
+        "sira": 10,
+        "ad": "Bankalara Borçlar (11+12)"
+      },
+      {
+        "id": 5750,
+        "sira": 11,
+        "ad": "a) Yurtiçi Bankalar"
+      },
+      {
+        "id": 5751,
+        "sira": 12,
+        "ad": "b) Yurtdışı Bankalar"
+      },
+      {
+        "id": 5870,
+        "sira": 13,
+        "ad": "Repo İşl. Sağlanan Fonlar"
+      },
+      {
+        "id": 5752,
+        "sira": 14,
+        "ad": "İhraç Edilen Menkul Kıymetler (Net)"
+      },
+      {
+        "id": 5753,
+        "sira": 15,
+        "ad": "Bankalara Kullandırılan Krediler (Bilgi)"
+      },
+      {
+        "id": 5754,
+        "sira": 16,
+        "ad": "Bankalar Mevduatı (Bilgi)"
+      }
+    ]
+  },
+  "6": {
+    "bddk_id": 294,
+    "ad": "Bilanço Dışı İşlemler",
+    "kalemler": [
+      {
+        "id": 5755,
+        "sira": 1,
+        "ad": "Gayrinakdi Kredi ve Yükümlülükler"
+      },
+      {
+        "id": 5756,
+        "sira": 2,
+        "ad": "Taahhütler (3+4)"
+      },
+      {
+        "id": 5757,
+        "sira": 3,
+        "ad": "a) Türev Finansal Araçlar"
+      },
+      {
+        "id": 5758,
+        "sira": 4,
+        "ad": "b) Diğer"
+      }
+    ]
+  },
+  "7": {
+    "bddk_id": 295,
+    "ad": "Bankalarda Saklanan Menkul Değerler - 1",
+    "kalemler": [
+      {
+        "id": 5759,
+        "sira": 1,
+        "ad": "Bankalarda Saklanan Menkul Değerler (Nominal) (2+24)"
+      },
+      {
+        "id": 5760,
+        "sira": 2,
+        "ad": "Yurtiçi Yerleşikler Adına Saklanan (3+7+11+15+19)"
+      },
+      {
+        "id": 5761,
+        "sira": 3,
+        "ad": "Gerçek Kişiler (4+5+6)"
+      },
+      {
+        "id": 5762,
+        "sira": 4,
+        "ad": "a) Kamu Borçlanma Senetleri"
+      },
+      {
+        "id": 5763,
+        "sira": 5,
+        "ad": "b) Eurobondlar"
+      },
+      {
+        "id": 5764,
+        "sira": 6,
+        "ad": "c) Diğer"
+      },
+      {
+        "id": 5765,
+        "sira": 7,
+        "ad": "Sigorta Şirketleri (8+9+10)"
+      },
+      {
+        "id": 5766,
+        "sira": 8,
+        "ad": "a) Kamu Borçlanma Senetleri"
+      },
+      {
+        "id": 5767,
+        "sira": 9,
+        "ad": "b) Eurobondlar"
+      },
+      {
+        "id": 5768,
+        "sira": 10,
+        "ad": "c) Diğer"
+      },
+      {
+        "id": 5769,
+        "sira": 11,
+        "ad": "Diğer Tüzel Kişiler (12+13+14)"
+      },
+      {
+        "id": 5770,
+        "sira": 12,
+        "ad": "a) Kamu Borçlanma Senetleri"
+      },
+      {
+        "id": 5771,
+        "sira": 13,
+        "ad": "b) Eurobondlar"
+      },
+      {
+        "id": 5772,
+        "sira": 14,
+        "ad": "c) Diğer"
+      },
+      {
+        "id": 5773,
+        "sira": 15,
+        "ad": "Bankalar (16+17+18)"
+      },
+      {
+        "id": 5774,
+        "sira": 16,
+        "ad": "a) Kamu Borçlanma Senetleri"
+      },
+      {
+        "id": 5775,
+        "sira": 17,
+        "ad": "b) Eurobondlar"
+      },
+      {
+        "id": 5776,
+        "sira": 18,
+        "ad": "c) Diğer"
+      },
+      {
+        "id": 5777,
+        "sira": 19,
+        "ad": "Diğer Mali Kuruluşlar (20+21+22)"
+      },
+      {
+        "id": 5778,
+        "sira": 20,
+        "ad": "a) Kamu Borçlanma Senetleri"
+      },
+      {
+        "id": 5779,
+        "sira": 21,
+        "ad": "b) Eurobondlar"
+      },
+      {
+        "id": 5780,
+        "sira": 22,
+        "ad": "c) Diğer"
+      },
+      {
+        "id": 5781,
+        "sira": 23,
+        "ad": "Döv. End..KBS (Bilgi)"
+      },
+      {
+        "id": 5782,
+        "sira": 24,
+        "ad": "Yurtdışı Yerleşikler Adına Saklanan (25+29+33+37+41)"
+      },
+      {
+        "id": 5783,
+        "sira": 25,
+        "ad": "Gerçek Kişiler (26+27+28)"
+      },
+      {
+        "id": 5784,
+        "sira": 26,
+        "ad": "a) Kamu Borçlanma Senetleri"
+      },
+      {
+        "id": 5785,
+        "sira": 27,
+        "ad": "b) Eurobondlar"
+      },
+      {
+        "id": 5786,
+        "sira": 28,
+        "ad": "c) Diğer"
+      },
+      {
+        "id": 5787,
+        "sira": 29,
+        "ad": "Sigorta Şirketleri (30+31+32)"
+      },
+      {
+        "id": 5788,
+        "sira": 30,
+        "ad": "a) Kamu Borçlanma Senetleri"
+      },
+      {
+        "id": 5789,
+        "sira": 31,
+        "ad": "b) Eurobondlar"
+      },
+      {
+        "id": 5790,
+        "sira": 32,
+        "ad": "c) Diğer"
+      },
+      {
+        "id": 5791,
+        "sira": 33,
+        "ad": "Diğer Tüzel Kişiler (34+35+36)"
+      },
+      {
+        "id": 5792,
+        "sira": 34,
+        "ad": "a) Kamu Borçlanma Senetleri"
+      },
+      {
+        "id": 5793,
+        "sira": 35,
+        "ad": "b) Eurobondlar"
+      },
+      {
+        "id": 5794,
+        "sira": 36,
+        "ad": "c) Diğer"
+      },
+      {
+        "id": 5795,
+        "sira": 37,
+        "ad": "Bankalar (38+39+40)"
+      },
+      {
+        "id": 5796,
+        "sira": 38,
+        "ad": "a) Kamu Borçlanma Senetleri"
+      },
+      {
+        "id": 5797,
+        "sira": 39,
+        "ad": "b) Eurobondlar"
+      },
+      {
+        "id": 5798,
+        "sira": 40,
+        "ad": "c) Diğer"
+      },
+      {
+        "id": 5799,
+        "sira": 41,
+        "ad": "Diğer Mali Kuruluşlar (42+43+44)"
+      },
+      {
+        "id": 5800,
+        "sira": 42,
+        "ad": "a) Kamu Borçlanma Senetleri"
+      },
+      {
+        "id": 5801,
+        "sira": 43,
+        "ad": "b) Eurobondlar"
+      },
+      {
+        "id": 5802,
+        "sira": 44,
+        "ad": "c) Diğer"
+      },
+      {
+        "id": 5803,
+        "sira": 45,
+        "ad": "Döv. End..KBS (Bilgi)"
+      }
+    ]
+  },
+  "8": {
+    "bddk_id": 296,
+    "ad": "Bankalarda Saklanan Menkul Değerler - 2",
+    "kalemler": [
+      {
+        "id": 5804,
+        "sira": 1,
+        "ad": "Bankalarda Saklanan Menkul Değerler (Piyasa Değeri) (2+24)"
+      },
+      {
+        "id": 5805,
+        "sira": 2,
+        "ad": "Yurtiçi Yerleşikler Adına Saklanan (3+7+11+15+19)"
+      },
+      {
+        "id": 5806,
+        "sira": 3,
+        "ad": "Gerçek Kişiler (4+5+6)"
+      },
+      {
+        "id": 5807,
+        "sira": 4,
+        "ad": "a) Kamu Borçlanma Senetleri"
+      },
+      {
+        "id": 5808,
+        "sira": 5,
+        "ad": "b) Eurobondlar"
+      },
+      {
+        "id": 5809,
+        "sira": 6,
+        "ad": "c) Diğer"
+      },
+      {
+        "id": 5810,
+        "sira": 7,
+        "ad": "Sigorta Şirketleri (8+9+10)"
+      },
+      {
+        "id": 5811,
+        "sira": 8,
+        "ad": "a) Kamu Borçlanma Senetleri"
+      },
+      {
+        "id": 5812,
+        "sira": 9,
+        "ad": "b) Eurobondlar"
+      },
+      {
+        "id": 5813,
+        "sira": 10,
+        "ad": "c) Diğer"
+      },
+      {
+        "id": 5814,
+        "sira": 11,
+        "ad": "Diğer Tüzel Kişiler (12+13+14)"
+      },
+      {
+        "id": 5815,
+        "sira": 12,
+        "ad": "a) Kamu Borçlanma Senetleri"
+      },
+      {
+        "id": 5816,
+        "sira": 13,
+        "ad": "b) Eurobondlar"
+      },
+      {
+        "id": 5817,
+        "sira": 14,
+        "ad": "c) Diğer"
+      },
+      {
+        "id": 5818,
+        "sira": 15,
+        "ad": "Bankalar (16+17+18)"
+      },
+      {
+        "id": 5819,
+        "sira": 16,
+        "ad": "a) Kamu Borçlanma Senetleri"
+      },
+      {
+        "id": 5820,
+        "sira": 17,
+        "ad": "b) Eurobondlar"
+      },
+      {
+        "id": 5821,
+        "sira": 18,
+        "ad": "c) Diğer"
+      },
+      {
+        "id": 5822,
+        "sira": 19,
+        "ad": "Diğer Mali Kuruluşlar (20+21+22)"
+      },
+      {
+        "id": 5823,
+        "sira": 20,
+        "ad": "a) Kamu Borçlanma Senetleri"
+      },
+      {
+        "id": 5824,
+        "sira": 21,
+        "ad": "b) Eurobondlar"
+      },
+      {
+        "id": 5825,
+        "sira": 22,
+        "ad": "c) Diğer"
+      },
+      {
+        "id": 5826,
+        "sira": 23,
+        "ad": "Döv. End. KBS (Bilgi)"
+      },
+      {
+        "id": 5827,
+        "sira": 24,
+        "ad": "Yurtdışı Yerleşikler Adına Saklanan (25+29+33+37+41)"
+      },
+      {
+        "id": 5828,
+        "sira": 25,
+        "ad": "Gerçek Kişiler (26+27+28)"
+      },
+      {
+        "id": 5829,
+        "sira": 26,
+        "ad": "a) Kamu Borçlanma Senetleri"
+      },
+      {
+        "id": 5830,
+        "sira": 27,
+        "ad": "b) Eurobondlar"
+      },
+      {
+        "id": 5831,
+        "sira": 28,
+        "ad": "c) Diğer"
+      },
+      {
+        "id": 5832,
+        "sira": 29,
+        "ad": "Sigorta Şirketleri (30+31+32)"
+      },
+      {
+        "id": 5833,
+        "sira": 30,
+        "ad": "a) Kamu Borçlanma Senetleri"
+      },
+      {
+        "id": 5834,
+        "sira": 31,
+        "ad": "b) Eurobondlar"
+      },
+      {
+        "id": 5835,
+        "sira": 32,
+        "ad": "c) Diğer"
+      },
+      {
+        "id": 5836,
+        "sira": 33,
+        "ad": "Diğer Tüzel Kişiler (34+35+36)"
+      },
+      {
+        "id": 5837,
+        "sira": 34,
+        "ad": "a) Kamu Borçlanma Senetleri"
+      },
+      {
+        "id": 5838,
+        "sira": 35,
+        "ad": "b) Eurobondlar"
+      },
+      {
+        "id": 5839,
+        "sira": 36,
+        "ad": "c) Diğer"
+      },
+      {
+        "id": 5840,
+        "sira": 37,
+        "ad": "Bankalar (38+39+40)"
+      },
+      {
+        "id": 5841,
+        "sira": 38,
+        "ad": "a) Kamu Borçlanma Senetleri"
+      },
+      {
+        "id": 5842,
+        "sira": 39,
+        "ad": "b) Eurobondlar"
+      },
+      {
+        "id": 5843,
+        "sira": 40,
+        "ad": "c) Diğer"
+      },
+      {
+        "id": 5844,
+        "sira": 41,
+        "ad": "Diğer Mali Kuruluşlar (42+43+44)"
+      },
+      {
+        "id": 5845,
+        "sira": 42,
+        "ad": "a) Kamu Borçlanma Senetleri"
+      },
+      {
+        "id": 5846,
+        "sira": 43,
+        "ad": "b) Eurobondlar"
+      },
+      {
+        "id": 5847,
+        "sira": 44,
+        "ad": "c) Diğer"
+      },
+      {
+        "id": 5848,
+        "sira": 45,
+        "ad": "Döv. End. KBS (Bilgi)"
+      }
+    ]
+  },
+  "9": {
+    "bddk_id": 297,
+    "ad": "Yabancı Para Pozisyonu",
+    "kalemler": [
+      {
+        "id": 5884,
+        "sira": 1,
+        "ad": "Bilanço İçi Yabancı Para Pozisyonu (2-3)"
+      },
+      {
+        "id": 5885,
+        "sira": 2,
+        "ad": "a) Bilanço İçi Varlıklar"
+      },
+      {
+        "id": 5886,
+        "sira": 3,
+        "ad": "b) Bilanço İçi Yükümlülükler"
+      },
+      {
+        "id": 5887,
+        "sira": 4,
+        "ad": "Bilanço Dışı Yabancı Para Pozisyonu (5-6)"
+      },
+      {
+        "id": 5888,
+        "sira": 5,
+        "ad": "a) Bilanço Dışı Varlıklar"
+      },
+      {
+        "id": 5889,
+        "sira": 6,
+        "ad": "b) Bilanço Dışı Yükümlülükler"
+      },
+      {
+        "id": 5890,
+        "sira": 7,
+        "ad": "Yabancı Para Net Genel Pozisyonu (1+4)"
+      },
+      {
+        "id": 5891,
+        "sira": 8,
+        "ad": "Yasal Özkaynak"
+      },
+      {
+        "id": 5892,
+        "sira": 9,
+        "ad": "Dövize Endeskli Varlıklar (Bilgi)"
+      },
+      {
+        "id": 5893,
+        "sira": 10,
+        "ad": "Dövize Endeksli Yükümlülükler (Bilgi)"
+      },
+      {
+        "id": 5850,
+        "sira": 11,
+        "ad": "Bilanço İçi Yabancı Para Pozisyonu (2-3)"
+      },
+      {
+        "id": 5851,
+        "sira": 12,
+        "ad": "a) Bilanço İçi Varlıklar"
+      },
+      {
+        "id": 5852,
+        "sira": 13,
+        "ad": "b) Bilanço İçi Yükümlülükler"
+      },
+      {
+        "id": 5853,
+        "sira": 14,
+        "ad": "Bilanço Dışı Yabancı Para Pozisyonu (5-6)"
+      },
+      {
+        "id": 5854,
+        "sira": 15,
+        "ad": "a) Bilanço Dışı Varlıklar"
+      },
+      {
+        "id": 5855,
+        "sira": 16,
+        "ad": "b) Bilanço Dışı Yükümlülükler"
+      },
+      {
+        "id": 5856,
+        "sira": 17,
+        "ad": "Yabancı Para Net Genel Pozisyonu (1+4)"
+      },
+      {
+        "id": 5857,
+        "sira": 18,
+        "ad": "Yasal Özkaynak"
+      },
+      {
+        "id": 5858,
+        "sira": 19,
+        "ad": "Dövize Endeskli Varlıklar (Bilgi)"
+      },
+      {
+        "id": 5859,
+        "sira": 20,
+        "ad": "Dövize Endeksli Yükümlülükler (Bilgi)"
+      }
+    ]
+  }
+}
