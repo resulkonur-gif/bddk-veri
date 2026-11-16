@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BDDK Haftalık Bülten · Türk Bankacılık Sektörü</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wdth,wght@8..144,75..100,400..700&family=Roboto:wght@400;500;700&display=swap">
+<style>
+/* Layout: report spine — sticky period bar, then summary → banks → comparisons → full statement explorer; content max 1180px */
+:root{
+  --bg:#F3F5F8; --surface:#FFFFFF; --surface-2:#EAEEF4; --line:#D6DCE6;
+  --ink:#0F1A2C; --ink-2:#3B475C; --ink-3:#5C6880;
+  --accent:#1E4FA3; --accent-soft:#DCE6F7; --warm:#B85C12; --warm-soft:#F6E5D3;
+  --good:#16794C; --bad:#B42318;
+  --heat-lo:#EEF3FB; --heat-hi:#173F86; --heat-ink-hi:#FFFFFF;
+  --b0:#0072B2; --b1:#E69F00; --b2:#6A4C93; --b3:#009E73; --b4:#D55E00; --b5:#CC79A7; --b6:#56B4E9; --bt:#0F1A2C;
+  --display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --body:"Roboto",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0C121D; --surface:#131B29; --surface-2:#1A2436; --line:#2A364B;
+  --ink:#E8EDF5; --ink-2:#B7C1D2; --ink-3:#8E9AAF;
+  --accent:#7FA8F0; --accent-soft:#1D2D4A; --warm:#F0A45C; --warm-soft:#3A2817;
+  --good:#4FC48A; --bad:#F2786D;
+  --heat-lo:#18233A; --heat-hi:#8DB2F5; --heat-ink-hi:#0C121D;
+  --b0:#4DA3E0; --b1:#F2B640; --b2:#A98BD6; --b3:#3CC79D; --b4:#F08A47; --b5:#E39BC4; --b6:#8AD0F5; --bt:#E8EDF5;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0C121D; --surface:#131B29; --surface-2:#1A2436; --line:#2A364B;
+  --ink:#E8EDF5; --ink-2:#B7C1D2; --ink-3:#8E9AAF;
+  --accent:#7FA8F0; --accent-soft:#1D2D4A; --warm:#F0A45C; --warm-soft:#3A2817;
+  --good:#4FC48A; --bad:#F2786D;
+  --heat-lo:#18233A; --heat-hi:#8DB2F5; --heat-ink-hi:#0C121D;
+  --b0:#4DA3E0; --b1:#F2B640; --b2:#A98BD6; --b3:#3CC79D; --b4:#F08A47; --b5:#E39BC4; --b6:#8AD0F5; --bt:#E8EDF5;
+  color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;font-variant-numeric:tabular-nums;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top, 0px);z-index:10;background:var(--bg)}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:44px;padding-block:28px 64px}
+h1,h2,h3{font-family:var(--display);font-stretch:85%;text-wrap:balance;margin:0;color:var(--ink)}
+h1{font-size:clamp(34px,5.4vw,58px);line-height:1.02;font-weight:800;letter-spacing:-0.01em}
+h2{font-size:clamp(24px,3vw,32px);font-weight:750;line-height:1.1}
+h3{font-size:19px;font-weight:700}
+p{margin:0}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--warm)}
+.muted{color:var(--ink-3)}
+.lede{font-size:17px;color:var(--ink-2);max-width:68ch}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+.hdr{display:flex;flex-direction:column;gap:14px}
+.hdr-meta{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;color:var(--ink-3)}
+/* period bar */
+.pbar{position:sticky;top:env(safe-area-inset-top, 0px);z-index:5;background:var(--bg);padding-block:10px;border-bottom:1px solid var(--line);
+  display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
+.pbar-label{font-size:13px;font-weight:600;color:var(--ink-2)}
+.seg{display:flex;flex-wrap:wrap;gap:4px;background:var(--surface-2);padding:4px;border-radius:999px}
+.seg button{border:0;background:transparent;padding:7px 14px;border-radius:999px;cursor:pointer;font-size:14px;font-weight:600;color:var(--ink-2);min-height:36px}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.pbar-note{font-size:12.5px;color:var(--ink-3)}
+section{display:flex;flex-direction:column;gap:18px}
+.sec-head{display:flex;flex-direction:column;gap:6px}
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.kpi{border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:16px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:4px;min-height:132px;transition:border-color .15s}
+.kpi:hover{border-color:var(--accent)}
+.kpi[aria-expanded="true"]{border-color:var(--accent);box-shadow:inset 0 -3px 0 var(--accent)}
+.kpi .k-l{font-size:13px;font-weight:600;color:var(--ink-2)}
+.kpi .k-v{font-family:var(--display);font-stretch:80%;font-size:34px;font-weight:750;line-height:1.05}
+.kpi .k-u{font-size:12.5px;color:var(--ink-3)}
+.kpi .k-c{font-size:13px;font-weight:600;margin-top:auto}
+.up{color:var(--good)} .down{color:var(--bad)}
+.panel{border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:16px}
+.panel-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:24px}
+@media (max-width:820px){.panel-grid{grid-template-columns:minmax(0,1fr)}}
+.barlist{display:flex;flex-direction:column;gap:8px}
+.bl-row{display:grid;grid-template-columns:110px minmax(0,1fr) 92px 64px;gap:10px;align-items:center;font-size:14px}
+.bl-track{height:12px;background:var(--surface-2);border-radius:3px;overflow:hidden}
+.bl-fill{height:100%;border-radius:3px}
+.bl-v{text-align:right;font-weight:600}
+.bl-c{text-align:right;font-size:13px;font-weight:600}
+@media (max-width:520px){.bl-row{grid-template-columns:84px minmax(0,1fr) 78px;}.bl-c{display:none}}
+.chartbox{position:relative;width:100%;height:260px}
+.chartbox.tall{height:340px}
+.chartbox.short{height:200px}
+/* banks */
+.banks{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.bank{border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:16px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden}
+.bank::before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--bc)}
+.bank:hover{border-color:var(--bc)}
+.bank[aria-expanded="true"]{border-color:var(--bc);background:var(--surface-2)}
+.bank-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.bank-name{font-family:var(--display);font-stretch:85%;font-size:21px;font-weight:750}
+.bank-rank{font-size:12px;font-weight:700;color:var(--ink-3)}
+.bank-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.bs-l{font-size:11.5px;color:var(--ink-3);letter-spacing:.02em}
+.bs-v{font-size:15px;font-weight:700}
+.bank-more{font-size:12.5px;font-weight:600;color:var(--accent)}
+.bank-detail{grid-column:1/-1}
+.ratio-table{width:100%;border-collapse:collapse;font-size:13.5px}
+.ratio-table th,.ratio-table td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+.ratio-table th:first-child,.ratio-table td:first-child{text-align:left}
+.ratio-table thead th{font-size:12px;color:var(--ink-3);font-weight:600}
+.ratio-table td.cur,.ratio-table th.cur{background:var(--accent-soft);font-weight:700}
+.stack{display:flex;flex-direction:column;gap:10px}
+.stackbar{display:flex;height:26px;border-radius:5px;overflow:hidden;background:var(--surface-2)}
+.stackbar span{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--ink-2)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.bridge{display:flex;flex-direction:column;gap:6px}
+.br-row{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr) 88px;gap:10px;align-items:center;font-size:13.5px}
+.br-row.total{font-weight:700}
+.br-track{position:relative;height:14px}
+.br-bar{position:absolute;top:0;height:14px;border-radius:2px}
+.br-v{text-align:right}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px}
+@media (max-width:820px){.two{grid-template-columns:minmax(0,1fr)}}
+.subhead{font-size:13px;font-weight:700;color:var(--ink-2);letter-spacing:.02em}
+/* controls */
+.controls{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+.field{display:flex;flex-direction:column;gap:4px;font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.field{min-width:0;max-width:100%}
+select{max-width:100%}
+select,input[type=search]{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-height:40px;font-size:14px}
+input[type=search]{min-width:0;width:240px;max-width:100%}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 12px;min-height:40px;cursor:pointer;font-size:14px;font-weight:600}
+.btn:hover{border-color:var(--accent)}
+.insight{font-size:14.5px;color:var(--ink-2);max-width:80ch}
+.insight b{color:var(--ink)}
+/* heat */
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+.heat{border-collapse:separate;border-spacing:4px;width:100%;min-width:560px}
+.heat th{font-size:12.5px;color:var(--ink-3);font-weight:600;padding:4px 6px;text-align:center}
+.heat th.rowh{text-align:left;color:var(--ink);font-size:14px;white-space:nowrap}
+.heat td{text-align:center;padding:12px 6px;border-radius:6px;font-weight:700;font-size:14.5px}
+.heat tr.total th.rowh,.heat tr.total td{font-weight:800}
+/* explorer */
+.xtable{border-collapse:collapse;width:100%;min-width:1000px;font-size:13.5px}
+.xtable thead th{position:sticky;top:0;background:var(--surface-2);font-size:12px;font-weight:700;color:var(--ink-2);padding:9px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+.xtable thead th:first-child{text-align:left;min-width:330px}
+.xtable td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+.xtable td:first-child{text-align:left;white-space:normal}
+.xtable tr.l0 td{font-weight:700;background:color-mix(in srgb, var(--surface-2) 55%, transparent)}
+.xtable tr.hit td:first-child{box-shadow:inset 3px 0 0 var(--warm)}
+.xname{display:flex;align-items:flex-start;gap:6px}
+.caret{border:0;background:transparent;cursor:pointer;width:24px;height:24px;flex:none;display:inline-flex;align-items:center;justify-content:center;border-radius:4px;color:var(--ink-2)}
+.caret:hover{background:var(--surface-2)}
+.caret svg{transition:transform .15s}
+.caret[aria-expanded="true"] svg{transform:rotate(90deg)}
+.spacer{width:24px;flex:none}
+.xlabel{padding-top:2px}
+.xcode{font-size:11px;color:var(--ink-3);margin-left:6px}
+.chartbtn{border:1px solid var(--line);background:var(--surface);border-radius:6px;cursor:pointer;width:26px;height:24px;display:inline-flex;align-items:center;justify-content:center;flex:none;margin-left:auto;color:var(--accent)}
+.chartbtn[aria-pressed="true"]{background:var(--accent);color:var(--surface);border-color:var(--accent)}
+.xchart td{background:var(--surface-2);padding:14px}
+.neg{color:var(--bad)}
+.tab-chip{display:inline-block;font-size:11px;font-weight:700;color:var(--warm);background:var(--warm-soft);border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:1px}
+.xfoot{font-size:12.5px;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:6px 16px}
+details.notes{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:14px 18px}
+details.notes summary{cursor:pointer;font-weight:700}
+details.notes ul{margin:10px 0 0;padding-left:18px;color:var(--ink-2);display:flex;flex-direction:column;gap:6px;font-size:14px}
+footer{font-size:13px;color:var(--ink-3)}
+.grp-bars{display:flex;flex-direction:column;gap:8px}
+.gb-row{display:grid;grid-template-columns:minmax(0,240px) minmax(0,1fr) 90px 70px;gap:10px;align-items:center;font-size:14px}
+@media (max-width:620px){.gb-row{grid-template-columns:minmax(0,130px) minmax(0,1fr) 70px}.gb-row .gb-s{display:none}}
+.atable{border-collapse:collapse;width:100%;min-width:1100px;font-size:13.5px}
+.atable thead th{position:sticky;top:0;background:var(--surface-2);font-size:12px;font-weight:700;color:var(--ink-2);padding:0;border-bottom:1px solid var(--line);white-space:nowrap;text-align:right}
+.atable thead th button{all:unset;cursor:pointer;display:block;padding:9px 8px;width:100%;box-sizing:border-box}
+.atable thead th button:focus-visible{outline:2px solid var(--accent)}
+.atable thead th.l{text-align:left}
+.atable td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+.atable td.l{text-align:left}
+.atable tr.t7 td.nm{font-weight:700}
+.atable tr.selA td:first-child{box-shadow:inset 4px 0 0 var(--b0)}
+.atable tr.selB td:first-child{box-shadow:inset 4px 0 0 var(--b1)}
+.pick{display:inline-flex;gap:4px}
+.pick button{border:1px solid var(--line);background:var(--surface);border-radius:6px;min-width:32px;height:30px;cursor:pointer;font-weight:700;font-size:12px;color:var(--ink-2)}
+.pick button.a[aria-pressed="true"]{background:var(--b0);border-color:var(--b0);color:#FFFFFF}
+.pick button.b[aria-pressed="true"]{background:var(--b1);border-color:var(--b1);color:#1B1205}
+.gtag{font-size:11.5px;color:var(--ink-3)}
+.flag{color:var(--warm);font-weight:700}
+.vs{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+@media (max-width:720px){.vs{grid-template-columns:minmax(0,1fr)}}
+.vs-card{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:16px 16px 16px 22px;display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden}
+.vs-card::before{content:"";position:absolute;inset:0 auto 0 0;width:6px;background:var(--bc)}
+.vs-name{font-family:var(--display);font-stretch:85%;font-size:22px;font-weight:750}
+.vs-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.vstable{border-collapse:collapse;width:100%;font-size:14px}
+.vstable th,.vstable td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+.vstable th:first-child,.vstable td:first-child{text-align:left;white-space:normal}
+.vstable thead th{font-size:12px;color:var(--ink-3);font-weight:700}
+.vstable tr.grp td{background:var(--surface-2);font-weight:700;color:var(--ink-2)}
+/* ===== Material 3 layer ===== */
+:root{
+  --m-primary:#2B5EA7; --m-on-primary:#FFFFFF; --m-pc:#D7E3FF; --m-on-pc:#001B3F;
+  --m-sc:#DAE2F9; --m-on-sc:#131C2B; --m-tertiary:#8A5100; --m-tc:#FFDCBE; --m-on-tc:#2D1600;
+  --m-surface:#F9F9FF; --m-scl:#F3F3FA; --m-sc0:#EDEDF4; --m-sch:#E7E8EE; --m-schh:#E1E2E8; --m-lowest:#FFFFFF;
+  --m-on-surface:#191C20; --m-osv:#44474E; --m-outline:#74777F; --m-ov:#C4C6D0;
+  --m-shadow:rgba(17,24,39,.16); --m-state:rgba(43,94,167,.08);
+  --bg:var(--m-surface); --surface:var(--m-lowest); --surface-2:var(--m-sch); --line:var(--m-ov);
+  --ink:var(--m-on-surface); --ink-2:var(--m-osv); --ink-3:#5E6169;
+  --accent:var(--m-primary); --accent-soft:var(--m-pc); --warm:var(--m-tertiary); --warm-soft:var(--m-tc);
+  --heat-lo:#EEF2FB; --heat-hi:#1F4E91;
+  --display:"Roboto Flex","Roboto",system-ui,sans-serif; --body:"Roboto",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --r:16px; --e1:0 1px 2px var(--m-shadow),0 1px 3px 1px rgba(17,24,39,.08); --e2:0 1px 2px var(--m-shadow),0 2px 6px 2px rgba(17,24,39,.10);
+  --e3:0 4px 8px 3px rgba(17,24,39,.10),0 1px 3px var(--m-shadow);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --m-primary:#A9C7FF; --m-on-primary:#003063; --m-pc:#1E4679; --m-on-pc:#D7E3FF;
+  --m-sc:#3E4759; --m-on-sc:#DAE2F9; --m-tertiary:#FFB870; --m-tc:#693C00; --m-on-tc:#FFDCBE;
+  --m-surface:#111318; --m-scl:#191C20; --m-sc0:#1D2024; --m-sch:#282A2F; --m-schh:#33353A; --m-lowest:#1D2024;
+  --m-on-surface:#E2E2E9; --m-osv:#C4C6D0; --m-outline:#8E9099; --m-ov:#44474E;
+  --m-shadow:rgba(0,0,0,.5); --m-state:rgba(169,199,255,.10); --ink-3:#A3A6AF;
+  --bg:var(--m-surface); --surface:var(--m-lowest); --surface-2:var(--m-sch); --line:var(--m-ov); --ink:var(--m-on-surface); --ink-2:var(--m-osv); --accent:var(--m-primary); --accent-soft:var(--m-pc); --warm:var(--m-tertiary); --warm-soft:var(--m-tc);
+  --heat-lo:#1C2433; --heat-hi:#8DB4F7; --heat-ink-hi:#111318; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --m-primary:#A9C7FF; --m-on-primary:#003063; --m-pc:#1E4679; --m-on-pc:#D7E3FF;
+  --m-sc:#3E4759; --m-on-sc:#DAE2F9; --m-tertiary:#FFB870; --m-tc:#693C00; --m-on-tc:#FFDCBE;
+  --m-surface:#111318; --m-scl:#191C20; --m-sc0:#1D2024; --m-sch:#282A2F; --m-schh:#33353A; --m-lowest:#1D2024;
+  --m-on-surface:#E2E2E9; --m-osv:#C4C6D0; --m-outline:#8E9099; --m-ov:#44474E;
+  --m-shadow:rgba(0,0,0,.5); --m-state:rgba(169,199,255,.10); --ink-3:#A3A6AF;
+  --bg:var(--m-surface); --surface:var(--m-lowest); --surface-2:var(--m-sch); --line:var(--m-ov); --ink:var(--m-on-surface); --ink-2:var(--m-osv); --accent:var(--m-primary); --accent-soft:var(--m-pc); --warm:var(--m-tertiary); --warm-soft:var(--m-tc);
+  --heat-lo:#1C2433; --heat-hi:#8DB4F7; --heat-ink-hi:#111318; color-scheme:dark}
+body{padding-left:0;padding-right:0;font-size:15px;letter-spacing:.01em}
+.gut{padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+h1,h2,h3{font-stretch:100%;letter-spacing:0}
+h1{font-weight:600;font-size:clamp(32px,4.6vw,48px);line-height:1.08}
+h2{font-weight:500;font-size:clamp(22px,2.6vw,28px)}
+h3{font-weight:500;font-size:18px}
+.eyebrow{color:var(--m-primary);letter-spacing:.1em;font-weight:600}
+/* top app bar */
+.appbar{position:sticky;top:env(safe-area-inset-top, 0px);z-index:30;height:64px;display:flex;align-items:center;gap:8px;background:var(--m-sc0);transition:box-shadow .2s}
+.appbar.lift{box-shadow:var(--e2)}
+.appbar-in{max-width:1180px;margin:0 auto;width:100%;display:flex;align-items:center;gap:8px;min-width:0}
+.appbar-title{font-family:var(--display);font-size:22px;font-weight:500;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.icon-btn{width:48px;height:48px;border-radius:50%;border:0;background:transparent;color:var(--m-osv);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex:none;position:relative}
+.icon-btn:hover{background:var(--m-state)}
+.icon-btn svg,.mi{width:24px;height:24px;fill:currentColor}
+body::before{background:var(--m-sc0);z-index:31}
+.pbar{top:calc(env(safe-area-inset-top, 0px) + 64px);background:var(--m-surface);border-bottom:1px solid var(--m-ov);z-index:20}
+/* segmented buttons */
+.seg{background:transparent;border:1px solid var(--m-outline);padding:0;gap:0;border-radius:20px;flex-wrap:nowrap;overflow-x:auto;max-width:100%;scrollbar-width:none}
+.seg button{border-radius:0;border-left:1px solid var(--m-outline);min-height:40px;padding:0 14px;font-weight:500;font-size:14px;color:var(--m-on-surface);white-space:nowrap;display:inline-flex;align-items:center;gap:6px;background:transparent}
+.seg button:first-child{border-left:0}
+.seg button:hover{background:var(--m-state)}
+.seg button[aria-pressed="true"]{background:var(--m-sc);color:var(--m-on-sc);box-shadow:none}
+.seg button[aria-pressed="true"]::before{content:"";width:16px;height:16px;flex:none;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") center/contain no-repeat}
+.modeseg button{min-height:40px;padding:0 16px}
+@media (max-width:520px){.appbar-title{font-size:18px}.modeseg button{padding:0 10px;font-size:13px}.modeseg button[aria-pressed="true"]::before{display:none}}
+/* cards */
+.kpi{border:0;background:var(--m-scl);box-shadow:var(--e1);border-radius:16px;transition:box-shadow .2s,background .2s}
+.kpi:hover{box-shadow:var(--e2);border-color:transparent}
+.kpi[aria-expanded="true"]{background:var(--m-pc);color:var(--m-on-pc);box-shadow:var(--e2)}
+.kpi[aria-expanded="true"] .k-l,.kpi[aria-expanded="true"] .k-u,.kpi[aria-expanded="true"] .muted{color:var(--m-on-pc)}
+.kpi .k-v{font-stretch:100%;font-weight:500;font-size:32px}
+.panel{border:0;background:var(--m-scl);box-shadow:var(--e1);border-radius:16px}
+.bank{border:0;background:var(--m-scl);box-shadow:var(--e1);border-radius:16px;transition:box-shadow .2s}
+.bank::before{inset:0 0 auto 0;width:auto;height:4px}
+.bank:hover{box-shadow:var(--e2)}
+.bank[aria-expanded="true"]{background:var(--m-sc0);box-shadow:var(--e3)}
+.bank-name,.vs-name{font-stretch:100%;font-weight:500}
+.bank-more{color:var(--m-primary);font-weight:500}
+.vs-card{border:0;background:var(--m-scl);box-shadow:var(--e1);border-radius:16px}
+.vs-card::before{inset:0 0 auto 0;width:auto;height:4px}
+.vs-card{padding:20px 16px 16px}
+.scroll{border:0;background:var(--m-scl);box-shadow:var(--e1);border-radius:16px}
+details.notes{border:0;background:var(--m-scl);box-shadow:var(--e1);border-radius:16px}
+details.notes summary{font-weight:500}
+/* fields & buttons */
+.field{font-weight:500;color:var(--m-osv);font-size:12px;letter-spacing:.03em}
+select,input[type=search]{border:1px solid var(--m-outline);border-radius:4px;min-height:48px;padding:10px 12px;background:var(--m-surface);color:var(--m-on-surface);font-size:15px}
+select:hover,input[type=search]:hover{border-color:var(--m-on-surface)}
+select:focus,input[type=search]:focus{outline:none;border-color:var(--m-primary);box-shadow:inset 0 0 0 1px var(--m-primary)}
+.btn{border:1px solid var(--m-outline);border-radius:20px;min-height:40px;padding:0 20px;background:transparent;color:var(--m-primary);font-weight:500;align-self:flex-end}
+.btn:hover{background:var(--m-state);border-color:var(--m-outline)}
+.pick button{border-radius:50%;width:32px;min-width:32px;height:32px;border:1px solid var(--m-outline);background:transparent}
+.ratio-table td.cur,.ratio-table th.cur{background:var(--m-pc);color:var(--m-on-pc)}
+.xtable thead th,.atable thead th{background:var(--m-sch)}
+.tab-chip{background:var(--m-tc);color:var(--m-on-tc);border-radius:8px}
+.mode-chip{display:inline-flex;align-items:center;height:28px;padding:0 12px;border-radius:8px;background:var(--m-sc);color:var(--m-on-sc);font-size:13px;font-weight:500;letter-spacing:.02em;width:fit-content}
+.hdr-top{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+/* landing */
+#landing{min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding-block:48px;background:
+  radial-gradient(1200px 500px at 85% -10%, var(--m-pc), transparent 60%), var(--m-surface)}
+.land{max-width:920px;width:100%;display:flex;flex-direction:column;gap:28px}
+.land-kicker{font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--m-primary)}
+.land h1{font-size:clamp(40px,7vw,64px);font-weight:500;line-height:1.04;letter-spacing:-.01em}
+.land-sub{font-size:18px;line-height:1.5;color:var(--m-osv);max-width:60ch}
+.land-q{font-size:15px;font-weight:500;color:var(--m-on-surface)}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:680px){.choices{grid-template-columns:minmax(0,1fr)}}
+.choice{all:unset;box-sizing:border-box;cursor:pointer;position:relative;overflow:hidden;background:var(--m-scl);border-radius:28px;box-shadow:var(--e1);padding:24px;display:flex;flex-direction:column;gap:14px;transition:box-shadow .2s,transform .2s;min-width:0}
+.choice::after{content:"";position:absolute;inset:0;background:var(--m-primary);opacity:0;transition:opacity .15s;pointer-events:none}
+.choice:hover{box-shadow:var(--e3)}
+.choice:hover::after{opacity:.06}
+.choice:active::after{opacity:.12}
+.choice:focus-visible{outline:3px solid var(--m-primary);outline-offset:3px}
+.ch-ico{width:56px;height:56px;border-radius:16px;background:var(--m-pc);color:var(--m-on-pc);display:flex;align-items:center;justify-content:center}
+.ch-ico svg{width:28px;height:28px;fill:currentColor}
+.choice.k .ch-ico{background:var(--m-tc);color:var(--m-on-tc)}
+.ch-t{font-family:var(--display);font-size:28px;font-weight:500;color:var(--m-on-surface)}
+.ch-d{font-size:15px;line-height:1.5;color:var(--m-osv)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--m-ov);font-size:13px;font-weight:500;color:var(--m-osv);background:var(--m-surface)}
+.ch-go{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 24px;border-radius:20px;background:var(--m-primary);color:var(--m-on-primary);font-weight:500;font-size:14px;width:fit-content;margin-top:4px}
+.choice.k .ch-go{background:var(--m-tertiary);color:var(--m-surface)}
+.ch-go svg{width:18px;height:18px;fill:currentColor}
+.land-foot{font-size:13px;color:var(--ink-3);max-width:70ch}
+.fade-in{animation:fi .28s ease-out}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (max-width:520px){.pbar .seg button{padding:0 9px;font-size:13px}.pbar .seg button[aria-pressed="true"]::before{display:none}.pbar-label{display:none}}
+
+.land-h1b{color:var(--m-primary)}
+.ab-short{display:none}
+@media (max-width:640px){.ab-long{display:none}.ab-short{display:inline}}
+.pctl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pctl select{min-height:40px;padding:6px 10px;border-radius:20px}
+.pctl .seg button:disabled{color:var(--ink-3);opacity:.45;cursor:default;background:transparent}
+.pctl .icon-btn{width:40px;height:40px}
+.pctl .icon-btn:disabled{opacity:.35;cursor:default}
+@media (max-width:520px){.pctl .icon-btn{width:34px;height:34px}}
+#cashKpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (min-width:1150px){#cashKpis{grid-template-columns:repeat(6,minmax(0,1fr))}}
+@media (max-width:560px){#cashKpis{grid-template-columns:repeat(2,minmax(0,1fr))}#cashKpis .kpi .k-v{font-size:26px}}
+#cashTable td.l,#cashTable th.l{text-align:left}
+#mvTable td.l,#mvTable th.l,#ozTable td.l,#ozTable th.l{text-align:left}
+#mvTable tr.tot td,#ozTable tr.tot td{font-weight:700;background:color-mix(in srgb, var(--surface-2) 55%, transparent)}
+#mvTable thead th:first-child,#ozTable thead th:first-child{min-width:170px}
+#ozTable thead th{white-space:normal;vertical-align:bottom}
+/* yeni sayfalar */
+.nv-chips{display:flex;flex-wrap:wrap;gap:8px}
+.nv-chip{display:inline-flex;align-items:center;gap:8px;min-height:32px;padding:0 4px 0 12px;border-radius:8px;border:1px solid var(--m-ov);background:var(--m-surface);font-size:13px;font-weight:500;color:var(--m-on-surface);max-width:100%}
+.nv-chip i{width:10px;height:10px;border-radius:2px;flex:none}
+.nv-chip button{all:unset;cursor:pointer;width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:var(--m-osv);flex:none}
+.nv-chip button:hover{background:var(--m-state)}
+.nv-chip button:focus-visible{outline:2px solid var(--m-primary)}
+.nv-sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:1px}
+.nv-t thead th{white-space:normal;vertical-align:bottom;min-width:92px}
+.nv-t thead th.cur{color:var(--m-primary)}
+.nv-t th.l,.nv-t td.l{text-align:left}
+.nv-t thead th:first-child,.nv-t td:first-child{position:sticky;left:0;z-index:1;background:var(--m-scl)}
+.nv-t thead th:first-child{z-index:3;background:var(--m-sch)}
+.nv-t td:first-child{min-width:300px;max-width:460px}
+.nv-t tbody tr.lv0 td{font-weight:700}
+.nv-t tbody tr[data-i],.nv-t tbody tr[data-m]{cursor:pointer}
+.nv-t tbody tr[data-i]:hover td,.nv-t tbody tr[data-m]:hover td{background:color-mix(in srgb, var(--m-primary) 6%, var(--m-scl))}
+.nv-t tbody tr.sel td{background:color-mix(in srgb, var(--m-primary) 14%, var(--m-scl))}
+.nv-t td .sub{display:block;font-size:11.5px;font-weight:400;margin-top:2px}
+.nv-name{display:flex;align-items:flex-start;gap:4px;line-height:1.35}
+.nv-car{border:0;background:transparent;cursor:pointer;width:24px;height:24px;flex:none;display:inline-flex;align-items:center;justify-content:center;border-radius:4px;color:var(--ink-2);margin-top:-2px;padding:0}
+.nv-car:hover{background:var(--surface-2)}
+.nv-car:disabled{cursor:default;opacity:.5}
+.nv-car span{transition:transform .15s}
+@media (max-width:640px){.nv-t td:first-child{min-width:180px;max-width:220px}.nv-t thead th:first-child{min-width:180px}.nv-t thead th{min-width:80px}}
+.nv-sp{width:24px;flex:none}
+.nv-code{font-size:11px;color:var(--ink-3);margin-left:6px;font-weight:400}
+.nv-tag{font-size:10.5px;font-weight:700;color:var(--warm);background:var(--warm-soft);border-radius:4px;padding:0 5px;margin-left:4px}
+.nv-tools input[type=search]{flex:1 1 240px;min-width:0}
+.dn-blk{display:flex;flex-direction:column;gap:14px;padding-top:18px;border-top:1px solid var(--m-ov)}
+.dn-blk:first-of-type{border-top:0;padding-top:0}
+.dn-h{margin:0;font-size:20px;font-weight:500}
+.nv-calc{color:var(--m-primary);background:color-mix(in srgb, var(--m-primary) 12%, transparent)}
+.nv-t tbody tr.calc td{font-weight:600;border-top:1px solid var(--m-outline)}
+.nv-t tbody tr.mx-h td{font-weight:700;background:var(--m-sch);font-size:13px}
+.nv-t td.mx-t{font-weight:600}
+.seg button:disabled{opacity:.45;cursor:not-allowed}
+.nv-chk{display:flex;gap:8px;align-items:center;font-size:14px}
+.nv-h3{margin:0;font-size:15px;font-weight:600}
+.nv-scroll{max-height:78vh;overflow:auto}
+.nv-foot{font-size:12.5px;margin:0}
+.pos{color:var(--good)}
+.choice.v .ch-ico{background:var(--m-sc);color:var(--m-on-sc)}
+.choice.t .ch-ico{background:var(--m-pc, var(--m-sc));color:var(--m-on-pc, var(--m-on-sc))}
+details.ozdet{padding:0}
+details.ozdet>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:16px 20px;font-size:16px;font-weight:500}
+details.ozdet>summary::-webkit-details-marker{display:none}
+details.ozdet>summary .chev{width:24px;height:24px;flex:none;transition:transform .2s;color:var(--m-primary)}
+details.ozdet[open]>summary .chev{transform:rotate(180deg)}
+details.ozdet>summary .sub{font-size:13px;font-weight:400;color:var(--ink-3)}
+.ozdet-body{display:flex;flex-direction:column;gap:22px;padding:4px 20px 20px}
+.ozdet-body h3{margin:0 0 4px;font-size:15px;font-weight:600}
+.ozdet-body .hint{margin:0 0 10px;font-size:13px;color:var(--ink-3)}
+.ozdet-body table td.l,.ozdet-body table th.l{text-align:left}
+.ozdet-body tr.tot td{font-weight:700;background:color-mix(in srgb, var(--surface-2) 55%, transparent)}
+#ozMix td.bar{min-width:220px;width:34%}
+#ozMix .stackbar{margin:0}
+#ozItems td.l{max-width:440px;white-space:normal;line-height:1.35}
+#ozItems tr.hdr td{max-width:none;font-weight:700;background:var(--surface-2);font-size:12.5px;letter-spacing:.03em;text-transform:none}
+#ozItems tr.sum td{font-weight:600}
+#ozItems tr.ratio td.l{color:var(--ink-2)}
+#ozItems tbody tr:not(.hdr){cursor:pointer}
+#ozItems tbody tr:not(.hdr):hover td{background:var(--m-state)}
+#ozItems tbody tr.sel td{background:color-mix(in srgb, var(--m-primary) 12%, transparent)}
+#ozItems .ic{font-size:11px;color:var(--ink-3);margin-left:6px}
+#cashTable tr.tot td{font-weight:700;background:color-mix(in srgb, var(--surface-2) 55%, transparent)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<style>
+/* BDDK raporuna özgü */
+.gtable{border-collapse:collapse;width:100%;min-width:1060px;font-size:13.5px}
+.gtable thead th{position:sticky;top:0;background:var(--m-sch);font-size:12px;font-weight:700;color:var(--ink-2);padding:9px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:normal;vertical-align:bottom}
+.gtable th.l,.gtable td.l{text-align:left}
+.gtable td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+.gtable tbody tr{cursor:pointer}
+.gtable tbody tr:hover td{background:var(--m-state)}
+.gtable tbody tr.sel td{background:color-mix(in srgb, var(--m-primary) 12%, transparent)}
+.gtable tr.sub td.l{padding-left:26px;color:var(--ink-2)}
+.gtable tr.tot td{font-weight:700}
+.gtable tr.sec td{background:var(--m-sch);font-weight:700;font-size:12px;letter-spacing:.04em;color:var(--ink-2);cursor:default}
+.gtable td.hm{border-radius:0}
+.struct{display:flex;flex-direction:column;gap:14px}
+.st-row{display:grid;grid-template-columns:minmax(0,170px) minmax(0,1fr);gap:12px;align-items:center;font-size:14px}
+.st-row .st-l{font-weight:500}
+.st-row .st-l small{display:block;font-size:11.5px;color:var(--ink-3);font-weight:400}
+.st-bars{display:flex;flex-direction:column;gap:4px}
+.st-bar{display:flex;height:18px;border-radius:4px;overflow:hidden;background:var(--surface-2)}
+.st-bar span{display:block;height:100%;font-size:10.5px;color:#fff;line-height:18px;padding-left:4px;overflow:hidden;white-space:nowrap}
+.st-tag{font-size:10.5px;color:var(--ink-3);width:34px;flex:none}
+.st-line{display:flex;align-items:center;gap:6px}
+.st-line .st-bar{flex:1}
+@media (max-width:620px){.st-row{grid-template-columns:minmax(0,1fr)}}
+.xt2{border-collapse:collapse;width:100%;font-size:13.5px}
+.xt2 thead th{position:sticky;top:0;z-index:2;background:var(--m-sch);font-size:12px;font-weight:700;color:var(--ink-2);padding:9px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+.xt2 thead th.cur{color:var(--m-primary)}
+.xt2 td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+.xt2 th:first-child,.xt2 td:first-child{position:sticky;left:0;z-index:1;background:var(--m-scl);text-align:left;white-space:normal;min-width:320px;max-width:440px}
+.xt2 thead th:first-child{z-index:3;background:var(--m-sch)}
+.xt2 tr.b td{font-weight:700}
+.xt2 tr.l1 td:first-child .xn{padding-left:16px}
+.xt2 tr.l2 td:first-child .xn{padding-left:32px;color:var(--ink-2)}
+.xt2 .xrow{display:flex;align-items:flex-start;gap:8px}
+.xt2 .xn{flex:1;line-height:1.35}
+.xt2 tr.xchart td{background:var(--surface-2);position:static}
+.xt2 tr.xchart td>div{position:sticky;left:0;max-width:min(1140px, calc(100vw - 48px))}
+.xt2 td.nil{color:var(--ink-3)}
+@media (max-width:640px){.xt2 th:first-child,.xt2 td:first-child{min-width:180px;max-width:220px}}
+.gchk{display:flex;flex-wrap:wrap;gap:6px}
+.gchk label{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px;border-radius:8px;border:1px solid var(--m-ov);font-size:13px;cursor:pointer;background:var(--m-surface)}
+.gchk label:has(input:checked){background:var(--m-sc);color:var(--m-on-sc);border-color:var(--m-sc)}
+.gchk input{accent-color:var(--m-primary);margin:0}
+.gchk i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.loading{font-size:14px;color:var(--ink-3)}
+.nv-tools .field input[type=search]{flex:none;width:260px;max-width:100%}
+.toc{display:flex;flex-wrap:wrap;gap:8px}
+.toc a{display:inline-flex;align-items:center;height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--m-ov);font-size:13px;font-weight:500;color:var(--m-on-surface);text-decoration:none;background:var(--m-surface)}
+.toc a:hover{background:var(--m-state)}
+.tsecs{display:flex;flex-direction:column;gap:36px}
+.tsec{display:flex;flex-direction:column;gap:14px;scroll-margin-top:150px}
+.tsec-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;padding-top:18px;border-top:1px solid var(--m-ov)}
+.tsec-h h3{font-size:22px;font-weight:500}
+.tsec-h .muted{font-size:13px}
+.cgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:860px){.cgrid{grid-template-columns:minmax(0,1fr)}}
+.cpanel{border-radius:16px;background:var(--m-scl);box-shadow:var(--e1);padding:16px 16px 10px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.cpanel h4{margin:0;font-size:15px;font-weight:600}
+.cpanel .csub{font-size:12px;color:var(--ink-3);margin-top:-4px}
+.cpanel .chartbox{height:280px}
+.cpanel.wide{grid-column:1/-1}
+details.ttab{border-radius:16px;background:var(--m-scl);box-shadow:var(--e1)}
+details.ttab>summary{cursor:pointer;padding:14px 18px;font-weight:500;list-style:none;display:flex;align-items:center;gap:10px}
+details.ttab>summary::-webkit-details-marker{display:none}
+details.ttab>summary::before{content:"";width:8px;height:8px;border-right:2px solid var(--m-primary);border-bottom:2px solid var(--m-primary);transform:rotate(-45deg);transition:transform .15s}
+details.ttab[open]>summary::before{transform:rotate(45deg)}
+details.ttab .ttab-in{padding:0 12px 14px;display:flex;flex-direction:column;gap:10px}
+details.ttab .ttab-ctl{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px;padding:0 6px}
+details.ttab .ttab-ctl select{min-height:36px;padding:4px 10px;border-radius:18px;font-size:14px}
+details.ttab .scroll{box-shadow:none;max-height:70vh;overflow:auto}
+.kpi .k-c small{font-weight:400;color:var(--ink-3)}
+.kpi[aria-expanded="true"] .k-c small{color:var(--m-on-pc)}
+</style>
+
+<style>
+.chg td.l{white-space:normal}
+.chg tr.ind td.l{padding-left:26px;color:var(--ink-2)}
+.chg tr.hd td{background:var(--m-sch);font-weight:700;font-size:12px;letter-spacing:.04em;color:var(--ink-2);cursor:default}
+.chg tbody tr{cursor:default}
+.k-sub{font-size:11.5px;color:var(--ink-3);display:block;margin-top:2px}
+.kpi[aria-expanded="true"] .k-sub{color:var(--m-on-pc)}
+.navlink{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:18px;border:1px solid var(--m-ov);font-size:14px;font-weight:500;color:var(--m-primary);text-decoration:none}
+.navlink:hover{background:var(--m-state)}
+.oldtag{font-size:11px;color:var(--ink-3);font-weight:400;margin-left:6px}
+</style>
+
+<div id="landing" class="gut" lang="tr">
+  <div class="land fade-in">
+    <span class="land-kicker">BDDK Haftalık Bülten · {{ARALIK}}</span>
+    <h1>Türk Bankacılık Sektörü<br><span class="land-h1b">BDDK Haftalık Bülten Verileri</span></h1>
+    <p class="land-sub">BDDK’nın Haftalık Bülten’indeki 9 tablonun tamamı, {{ARALIK_DEN_YA}} {{N}} hafta ve 10 banka grubu için tek sayfada: krediler, takipteki alacaklar, menkul değerler, mevduat, diğer bilanço kalemleri, bilanço dışı işlemler, bankalarda saklanan menkul değerler ve yabancı para pozisyonu. Haftalık, aylık ve yıllık değişimleri izleyin; TL ve yabancı para ayrımını görün.</p>
+    <p class="land-q">Nereden başlayalım?</p>
+    <div class="choices">
+      <button type="button" class="choice" data-go="sec-ozet">
+        <span class="ch-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 18.49 9.5 12.48l4 4L22 6.92 20.59 5.5l-7.09 7.97-4-4L2 16.99z"/></svg></span>
+        <span class="ch-t">Özet göstergeler</span>
+        <span class="ch-d">Krediler, mevduat, takip oranı, menkul değerler ve döviz pozisyonu; TL ve YP ayrımıyla, uzun dönem grafiğiyle.</span>
+        <span class="ch-go">Özeti aç <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></span>
+      </button>
+      <button type="button" class="choice k" data-go="sec-degisim">
+        <span class="ch-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg></span>
+        <span class="ch-t">Bu hafta ne değişti?</span>
+        <span class="ch-d">Ana kalemlerin haftalık, 4 haftalık, yılbaşından bu yana ve yıllık değişimi tek tabloda.</span>
+        <span class="ch-go">Değişimleri aç <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></span>
+      </button>
+      <button type="button" class="choice v" data-go="sec-grup">
+        <span class="ch-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h3v7H4zm6.5 0h3v7h-3zM2 19h20v3H2zm15-9h3v7h-3zm-5-9L2 6v2h20V6z"/></svg></span>
+        <span class="ch-t">Banka grupları</span>
+        <span class="ch-d">Mevduat, katılım, kalkınma ve yatırım bankaları ile kamu, yerli özel ve yabancı bankalar yan yana.</span>
+        <span class="ch-go">Grupları aç <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></span>
+      </button>
+      <button type="button" class="choice t" data-go="sec-bulten">
+        <span class="ch-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg></span>
+        <span class="ch-t">Bülten tabloları</span>
+        <span class="ch-d">9 tablo alt alta, bölüm bölüm: öne çıkan kalemler grafiklerle, altında tablonun tamamı.</span>
+        <span class="ch-go">Tabloları aç <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></span>
+      </button>
+    </div>
+    <p class="land-foot" id="landFoot"><a class="navlink" href="{{AYLIK_LINK}}">Aylık bülten raporuna geç →</a><br><br>Tutarlar BDDK’nın yayımladığı haliyle, nominaldir; YP kalemler TL karşılığıdır ve kur etkisi içerir.<br>Hazırlayan: <a href="https://www.linkedin.com/in/resulkonur/" target="_blank" rel="noopener" style="color:var(--m-primary);font-weight:500">Resul Konur</a> (LinkedIn)</p>
+  </div>
+</div>
+
+<div id="app" lang="tr" hidden>
+  <div class="appbar gut" id="appbar">
+    <div class="appbar-in">
+      <button type="button" class="icon-btn" id="homeBtn" aria-label="Başlangıç ekranına dön" title="Başlangıç ekranı"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+      <span class="appbar-title"><span class="ab-long">BDDK Haftalık Bülten · Türk Bankacılık Sektörü</span><span class="ab-short">BDDK Haftalık Bülten</span></span>
+      <a class="navlink" href="{{AYLIK_LINK}}" style="height:32px">Aylık bülten</a>
+      <button type="button" class="icon-btn" id="themeBtn" aria-label="Açık / koyu tema" title="Açık / koyu tema"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 0 1-4.4 2.26 5.4 5.4 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg></button>
+    </div>
+  </div>
+
+  <div class="wrap gut fade-in">
+    <header class="hdr">
+      <div class="hdr-top"><span class="eyebrow">BDDK Haftalık Bülten · 9 tablo · 10 banka grubu</span><span class="mode-chip">TL · her cuma</span></div>
+      <h1>Türk Bankacılık Sektörü Haftalık Verileri</h1>
+      <p class="lede">{{ARALIK_DEN_YA}} {{N}} hafta; mevduat, katılım, kalkınma ve yatırım bankaları ile sahiplik grupları. Önce özet göstergeler ve haftalık değişimler, ardından banka grupları ve 9 tablo bölüm bölüm.</p>
+      <div class="hdr-meta"><span>Birim: milyar TL (aksi belirtilmedikçe)</span><span>Veri: <span id="mDate"></span> tarihinde güncellendi</span><span>Tutarlar nominaldir; YP kalemler kur etkisi içerir</span></div>
+    </header>
+
+    <div class="pbar" role="group" aria-label="Hafta seçimi">
+      <span class="pbar-label">Hafta</span>
+      <div class="pctl">
+        <button type="button" class="icon-btn" id="pPrev" aria-label="Önceki hafta" title="Önceki hafta"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
+        <select id="pSel" aria-label="Hafta"></select>
+        <button type="button" class="icon-btn" id="pNext" aria-label="Sonraki hafta" title="Sonraki hafta"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></button>
+      </div>
+      <span class="pbar-label">Karşılaştırma</span>
+      <div class="seg" id="cmpSeg" role="group" aria-label="Karşılaştırma">
+        <button type="button" data-c="h1" aria-pressed="false">Önceki hafta</button><button type="button" data-c="h4" aria-pressed="false">4 hafta önce</button><button type="button" data-c="ys" aria-pressed="false">Önceki yıl sonu</button><button type="button" data-c="yil" aria-pressed="true">Geçen yıl</button>
+      </div>
+      <span class="pbar-note" id="pNote"></span>
+    </div>
+
+    <section aria-labelledby="h-ozet" id="sec-ozet">
+      <div class="sec-head"><h2 id="h-ozet">Özet göstergeler</h2><p class="insight" id="ozInsight"></p></div>
+      <div class="controls"><label class="field">Banka grubu<select id="kGrp"></select></label></div>
+      <div class="kpis" id="kpis"></div>
+      <div class="panel" id="kpiPanel">
+        <div class="controls" style="justify-content:space-between;align-items:center">
+          <h3 id="kpiTitle"></h3>
+          <div class="seg rngSeg" role="group" aria-label="Grafik aralığı"><button type="button" data-r="1" aria-pressed="false">1 yıl</button><button type="button" data-r="3" aria-pressed="true">3 yıl</button><button type="button" data-r="0" aria-pressed="false">Tümü</button></div>
+        </div>
+        <div class="gchk" id="kpiGroups"></div>
+        <div class="chartbox tall"><canvas id="kpiChart"></canvas></div>
+        <p class="nv-foot muted" id="kpiFoot"></p>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-deg" id="sec-degisim">
+      <div class="sec-head"><h2 id="h-deg">Bu hafta ne değişti?</h2><p class="insight" id="degInsight"></p></div>
+      <div class="controls"><label class="field">Banka grubu<select id="dGrp"></select></label></div>
+      <div class="scroll"><table class="gtable chg" id="degTable"></table></div>
+      <p class="nv-foot muted">Değişimler nominaldir. YP kalemler yabancı para bakiyelerin TL karşılığıdır; TL’deki değer kaybı bu kalemleri büyütür. Yılbaşı: önceki yılın son haftası. Yıllık: 52 hafta önce.</p>
+    </section>
+
+    <section aria-labelledby="h-grup" id="sec-grup">
+      <div class="sec-head"><h2 id="h-grup">Banka grupları</h2><p class="insight" id="grInsight"></p></div>
+      <div class="scroll"><table class="gtable" id="grTable"></table></div>
+      <p class="nv-foot muted">Satıra tıklayınca özet göstergeler o grup için gösterilir. Renk yoğunluğu oranın gruplar arasındaki sırasını gösterir. Fonksiyon ve sahiplik grupları farklı kesitlerdir; toplanmaz.</p>
+    </section>
+
+    <section aria-labelledby="h-bt" id="sec-bulten">
+      <div class="sec-head"><h2 id="h-bt">Bülten tabloları</h2><p class="insight">9 tablo bölüm bölüm. Grafikler aşağıdaki banka grubuna ve aralığa göre çizilir; grupları karşılaştıran grafiklerde işaretli gruplar görünür.</p></div>
+      <div class="controls" style="align-items:flex-end">
+        <label class="field">Grafiklerde banka grubu<select id="tGrp"></select></label>
+        <div class="field">Grafik aralığı<div class="seg rngSeg" role="group" aria-label="Grafik aralığı"><button type="button" data-r="1" aria-pressed="false">1 yıl</button><button type="button" data-r="3" aria-pressed="true">3 yıl</button><button type="button" data-r="0" aria-pressed="false">Tümü</button></div></div>
+      </div>
+      <div class="gchk" id="tGroups"></div>
+      <nav class="toc" id="tToc" aria-label="Tablolar"></nav>
+      <div id="tSecs" class="tsecs"></div>
+    </section>
+
+    <section aria-labelledby="h-not">
+      <details class="notes">
+        <summary id="h-not">Kaynak, tanımlar ve yöntem notları</summary>
+        <ul>
+          <li><b>Kaynak:</b> BDDK Haftalık Bülten (bddk.org.tr/BultenHaftalik), Gelişmiş Gösterim. BDDK bu bülten için ayrı bir metaveri yayımlamıyor. Veriler cuma günü itibarıyla, bankaların BDDK’ya gönderdiği haftalık raporlardan derlenir ve geçicidir; sonraki haftalarda revize edilebilir.</li>
+          <li><b>Kapsam:</b> Türkiye’de faaliyet gösteren mevduat, katılım ve kalkınma ve yatırım bankaları. Sahiplik grupları (kamu, yerli özel, yabancı) üç fonksiyon grubunu da kapsar.</li>
+          <li><b>TP / YP:</b> TP Türk lirası cinsinden, YP yabancı para cinsinden bakiyelerin TL karşılığıdır. YP kalemlerdeki değişim kur etkisini içerir. Yabancı Para Pozisyonu tablosunda BDDK yalnız toplamı yayımlar.</li>
+          <li><b>Takip oranı:</b> takipteki alacaklar / (krediler + takipteki alacaklar). Haftalık bültendeki krediler canlı kredilerdir.</li>
+          <li><b>Yapı değişiklikleri:</b> Menkul değerler tablosunun eski kırılımı 2022 sonbaharında, yabancı para pozisyonunun eski kalemleri 2023 başında yenileriyle değişti. Grafiklerde eski ve yeni kalem tek seride birleştirilmiştir; tablolarda ikisi ayrı satırdır ve eski satırlar “eski yapı” olarak işaretlidir. Kur korumalı mevduat 2022’de başlayıp 2026’da sona ermiştir.</li>
+          <li><b>Hassasiyet:</b> Rapordaki değerler milyon TL’ye yuvarlanmıştır. Tam hassasiyetli veriler CSV ve Excel dosyalarındadır.</li>
+          <li>Tutarlar nominaldir; enflasyon ve kur etkisi arındırılmamıştır.</li>
+        </ul>
+      </details>
+    </section>
+
+    <footer>Kaynak: <a href="https://www.bddk.org.tr/BultenHaftalik" target="_blank" rel="noopener" style="color:var(--m-primary)">BDDK Haftalık Bülten</a>. Hazırlayan: <a href="https://www.linkedin.com/in/resulkonur/" target="_blank" rel="noopener" style="color:var(--m-primary)">Resul Konur</a>. Son güncelleme: <span id="fDate"></span>. <a href="{{AYLIK_LINK}}" style="color:var(--m-primary)">Aylık bülten raporu</a>.</footer>
+  </div>
+</div>
+
+<script id="veri" type="application/octet-stream">{{VERI}}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const AY=["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
+const pLong=p=>{const [y,m,d]=p.split("-").map(Number);return `${d} ${AY[m-1]} ${y}`};
+const pShort=p=>{const [y,m,d]=p.split("-");return `${d}.${m}.${y.slice(2)}`};
+const nf=(x,d=0)=>x==null||!isFinite(x)?"–":x.toLocaleString("tr-TR",{minimumFractionDigits:d,maximumFractionDigits:d});
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const GRP_COL=["--bt","#0072B2","#56B4E9","#2B8CBE","#7FB3D5","#009E73","#6A4C93","#E69F00","#D55E00","#CC79A7"];
+const gcol=g=>{const c=GRP_COL[g]||"#888";return c.startsWith("--")?css(c):c};
+const GORDER=[["sec","Fonksiyon grupları"],["tot","Sektör"],["","Mevduat"],["sub","Mevduat-Kamu"],["sub","Mevduat-Yerli Özel"],["sub","Mevduat-Yabancı"],["","Katılım"],["","Kalkınma ve Yatırım"],["sec","Sahiplik grupları"],["","Kamu"],["","Yerli Özel"],["","Yabancı"]];
+const DEFAULT_ON=["Sektör","Kamu","Yerli Özel","Yabancı","Katılım"];
+const PAL=["#2B5EA7","#E69F00","#009E73","#CC79A7","#56B4E9","#D55E00","#6A4C93","#8C564B"];
+let D,T={},S={p:0,cmp:"yil",g:0,kpi:"kredi",kg:new Set(),rng:"3",tg:0,dg:0},charts={},tCharts={};
+
+async function load(){
+  const b64=$("veri").textContent.trim();
+  const bin=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
+  D=JSON.parse(await new Response(new Blob([bin]).stream().pipeThrough(new DecompressionStream("gzip"))).text());
+  D.np=D.per.length;D.ng=D.grp.length;D.gi={};D.grp.forEach((g,i)=>D.gi[g]=i);
+  D.S=new Map();
+  for(const e of D.s){const [t,s,g,c,p0]=e;const a=new Array(D.np).fill(null);let v=null;
+    for(let i=5;i<e.length;i++){const x=e[i];if(x===null)continue;v=v===null?x:v+x;a[p0+i-5]=v;}
+    D.S.set(`${t}:${s}:${g}:${D.cols[c]}`,a);}
+  delete D.s;
+  for(const t of D.tab){T[t.no]=t;t.byS={};t.items.forEach(it=>t.byS[it.s]=it);}
+  D.ms=D.per.map(p=>Date.parse(p+"T00:00:00Z"));
+  S.p=D.np-1;S.g=S.tg=S.dg=D.gi["Sektör"]??0;
+  DEFAULT_ON.forEach(n=>{if(n in D.gi)S.kg.add(D.gi[n])});
+}
+// ham değer (milyon TL)
+const raw=(t,s,c,g,p)=>{if(p<0)return null;const a=D.S.get(`${t}:${s}:${g}:${c}`);return a?a[p]:null};
+// ilk dolu olanı (yeni yapı, eski yapı)
+const rawAny=(t,ss,c,g,p)=>{for(const s of ss){const v=raw(t,s,c,g,p);if(v!=null)return v}return null};
+const M=(t,s,c="Toplam")=>(g,p)=>{const v=Array.isArray(s)?rawAny(t,s,c,g,p):raw(t,s,c,g,p);return v==null?null:v/1000};
+const ratio=(a,b)=>a==null||b==null||b===0?null:a/b*100;
+const pct=(a,b)=>a==null||b==null||b===0?null:(a/b-1)*100;
+function idxBack(p,days){const target=D.ms[p]-days*864e5;let q=p;while(q>0&&D.ms[q]>target)q--;return D.ms[q]<=target+3*864e5&&D.ms[q]>=target-10*864e5?q:-1;}
+function cmpIdx(p,mode){mode=mode||S.cmp;if(mode==="h1")return p>0?p-1:-1;if(mode==="h4")return idxBack(p,28);if(mode==="yil")return idxBack(p,364);
+  const y=+D.per[p].slice(0,4);let q=p;while(q>=0&&+D.per[q].slice(0,4)>=y)q--;return q;}
+const cmpLabel=m=>({h1:"önceki haftaya",h4:"4 hafta öncesine",ys:"önceki yıl sonuna",yil:"geçen yıla"}[m||S.cmp]);
+function chgHtml(x,ratioMode,inv,neutral,abs){if(x==null||!isFinite(x))return '<span class="muted">–</span>';
+  const s=(x>0?"+":"")+nf(x,ratioMode?2:1)+(ratioMode?" puan":(abs?" mlr":"%"));const cls=neutral?"":((x>0)!==!!inv?"up":"down");return `<span class="${cls}">${s}</span>`;}
+function rngStart(){if(S.rng==="0")return 0;const q=idxBack(D.np-1,365*(+S.rng));return Math.max(0,q<0?0:q);}
+
+// ---- KPI ----
+const NPL=(g,p)=>{const a=raw(2,1,"Toplam",g,p),k=raw(1,1,"Toplam",g,p);return a==null||k==null?null:a/(a+k)*100};
+const KPI=[
+ {id:"kredi",l:"Toplam krediler",f:M(1,1),ts:[1,1]},
+ {id:"tuk",l:"Tüketici kr. ve bireysel kartlar",f:M(1,2),ts:[1,2]},
+ {id:"tic",l:"Ticari ve diğer krediler",f:M(1,10),ts:[1,10]},
+ {id:"kobi",l:"KOBİ kredileri",f:M(1,19),ts:[1,19]},
+ {id:"takip",l:"Takipteki alacaklar",f:M(2,1),ts:[2,1]},
+ {id:"npl",l:"Takip oranı",r:1,inv:1,f:NPL},
+ {id:"mevduat",l:"Mevduat",f:M(4,1),ts:[4,1]},
+ {id:"ypm",l:"YP mevduat payı",r:1,neutral:1,f:(g,p)=>ratio(raw(4,1,"YP",g,p),raw(4,1,"Toplam",g,p))},
+ {id:"km",l:"Kredi / mevduat",r:1,neutral:1,f:(g,p)=>{const v=ratio(raw(1,1,"Toplam",g,p),raw(4,1,"Toplam",g,p));return v&&v<1000?v:null}},
+ {id:"mk",l:"Menkul değerler",f:M(3,1),ts:[3,1]},
+ {id:"kkm",l:"Kur korumalı mevduat",f:M(4,12),ts:[4,12]},
+ {id:"ypp",l:"YP net genel pozisyon",f:M(9,[7,17]),abs:1,neutral:1},
+];
+const kfmt=(k,v)=>v==null?"–":(k.r?nf(v,2):nf(v,Math.abs(v)>=1000?0:1));
+function kChange(k,g,p,q){const a=k.f(g,p),b=q<0?null:k.f(g,q);if(a==null||b==null)return null;return k.r||k.abs?a-b:pct(a,b);}
+function renderKpis(){
+  const g=S.g,p=S.p,q=cmpIdx(p);
+  $("kpis").innerHTML=KPI.map(k=>{
+    const v=k.f(g,p);if(v==null&&k.id==="kkm")return "";
+    let sub="";if(k.ts&&q>=0){const [tt,ss]=k.ts;
+      const a=pct(raw(tt,ss,"TP",g,p),raw(tt,ss,"TP",g,q)),b=pct(raw(tt,ss,"YP",g,p),raw(tt,ss,"YP",g,q));
+      if(a!=null||b!=null)sub=`<span class="k-sub">TL ${a==null?"–":(a>0?"+":"")+nf(a,1)+"%"} · YP ${b==null?"–":(b>0?"+":"")+nf(b,1)+"%"}</span>`;}
+    return `<button type="button" class="kpi" data-k="${k.id}" aria-expanded="${S.kpi===k.id}">
+      <span class="k-l">${k.l}</span><span class="k-v">${kfmt(k,v)}</span><span class="k-u">${k.r?"%":"milyar TL"}</span>
+      <span class="k-c">${chgHtml(kChange(k,g,p,q),k.r,k.inv,k.neutral,k.abs)} <small>${cmpLabel()} göre</small>${sub}</span></button>`}).join("");
+  $("kpis").querySelectorAll(".kpi").forEach(b=>b.onclick=()=>{S.kpi=b.dataset.k;renderKpis();renderKpiChart();});
+  const q1=cmpIdx(p,"h1"),qy=cmpIdx(p,"yil"),kr=KPI[0],mv=KPI[6];
+  const w=(k,qq)=>{const c=kChange(k,g,p,qq);return c==null?"–":(c>0?"+":"")+nf(c,1)+"%"};
+  $("ozInsight").innerHTML=`${pLong(D.per[p])} haftasında <b>${esc(D.grp[g])}</b>: krediler <b>${nf(kr.f(g,p),0)} milyar TL</b> (haftalık ${w(kr,q1)}, yıllık ${w(kr,qy)}), mevduat <b>${nf(mv.f(g,p),0)} milyar TL</b> (haftalık ${w(mv,q1)}, yıllık ${w(mv,qy)}). Takip oranı <b>%${nf(NPL(g,p),2)}</b>. Değişimler nominaldir; YP kalemler kur etkisi içerir.`;
+}
+function groupChecks(id,cb){
+  $(id).innerHTML=D.grp.map((n,g)=>`<label><input type="checkbox" data-g="${g}" ${S.kg.has(g)?"checked":""}><i style="background:${gcol(g)}"></i>${esc(n)}</label>`).join("");
+  $(id).querySelectorAll("input").forEach(i=>i.onchange=()=>{const g=+i.dataset.g;i.checked?S.kg.add(g):S.kg.delete(g);syncGroupChecks();renderKpiChart();refreshTSecs();});
+}
+function syncGroupChecks(){["kpiGroups","tGroups"].forEach(id=>$(id).querySelectorAll("input").forEach(i=>i.checked=S.kg.has(+i.dataset.g)));}
+function chartOpts(unit,dec,legend){
+  const ink=css("--ink-2"),line=css("--line");
+  return {responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:"index",intersect:false},
+    plugins:{legend:legend?{display:true,position:"bottom",labels:{color:ink,boxWidth:10,boxHeight:10}}:{display:false},
+      tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${nf(c.parsed.y,dec)} ${unit}`}}},
+    scales:{x:{ticks:{color:ink,maxRotation:0,autoSkip:true,maxTicksLimit:10},grid:{display:false}},
+            y:{ticks:{color:ink,callback:v=>nf(v,Math.abs(v)<10&&v!==0?1:0)},grid:{color:line}}},
+    elements:{point:{radius:0,hoverRadius:4},line:{borderWidth:2,tension:.1}}};
+}
+function renderKpiChart(){
+  const k=KPI.find(x=>x.id===S.kpi),p0=rngStart(),ps=[];for(let p=p0;p<D.np;p++)ps.push(p);
+  $("kpiTitle").textContent=`${k.l} (${k.r?"%":"milyar TL"}), ${pLong(D.per[p0])} – ${pLong(D.per[D.np-1])}`;
+  if(charts.kpi)charts.kpi.destroy();
+  charts.kpi=new Chart($("kpiChart"),{type:"line",data:{labels:ps.map(p=>pShort(D.per[p])),datasets:[...S.kg].sort((a,b)=>a-b).map(g=>({label:D.grp[g],data:ps.map(p=>k.f(g,p)),borderColor:gcol(g),backgroundColor:gcol(g),borderWidth:D.grp[g]==="Sektör"?3:2}))},options:chartOpts(k.r?"%":"milyar TL",k.r?2:0,false)});
+  $("kpiFoot").textContent=k.id==="npl"?"Takip oranı = takipteki alacaklar / (krediler + takipteki alacaklar).":k.id==="ypp"?"Net genel pozisyon; yapı değişikliği öncesi ve sonrası tek seride birleştirildi. Değişim milyar TL farkıdır.":"Tutarlar nominaldir; YP kısım kur etkisi içerir.";
+}
+
+// ---- haftalık değişim tablosu ----
+const DROWS=[["hd","Krediler"],["","Toplam krediler",M(1,1)],["ind","TL krediler",M(1,1,"TP")],["ind","YP krediler (TL karşılığı)",M(1,1,"YP")],
+ ["","Tüketici kredileri ve bireysel kartlar",M(1,2)],["ind","Konut",M(1,4)],["ind","Taşıt",M(1,5)],["ind","İhtiyaç",M(1,6)],["ind","Bireysel kredi kartları",M(1,7)],
+ ["","Ticari ve diğer krediler",M(1,10)],["ind","KOBİ kredileri",M(1,19)],["ind","Taksitli ticari krediler",M(1,12)],["ind","Kurumsal kredi kartları",M(1,16)],
+ ["","Takipteki alacaklar",M(2,1)],
+ ["hd","Fonlama"],["","Mevduat",M(4,1)],["ind","TL mevduat",M(4,1,"TP")],["ind","YP mevduat (TL karşılığı)",M(4,1,"YP")],["ind","Gerçek kişiler",M(4,2)],["ind","Ticari kuruluşlar",M(4,5)],["ind","Kur korumalı mevduat",M(4,12)],
+ ["","Bankalara borçlar",M(5,10)],["","Repo ile sağlanan fonlar",M(5,13)],["","TCMB’ye borçlar",M(5,8)],["","İhraç edilen menkul kıymetler",M(5,14)],
+ ["hd","Diğer"],["","Menkul değerler",M(3,1)],["","TCMB’den alacaklar",M(5,2)],["","Gayrinakdi krediler",M(6,1)],["","Türev finansal araçlar",M(6,3)],
+ ["","YP net genel pozisyon",M(9,[7,17]),1]];
+function renderDeg(){
+  const g=S.dg,p=S.p,qs=[cmpIdx(p,"h1"),cmpIdx(p,"h4"),cmpIdx(p,"ys"),cmpIdx(p,"yil")];
+  const cell=x=>`<td>${chgHtml(x,false,false,false,false)}</td>`;
+  let h=`<thead><tr><th class="l">Kalem</th><th>${pLong(D.per[p])}<br><span class="muted" style="font-weight:400">milyar TL</span></th><th>Haftalık<br><span class="muted" style="font-weight:400">milyar TL</span></th><th>Haftalık</th><th>4 hafta</th><th>Yılbaşından</th><th>Yıllık</th></tr></thead><tbody>`;
+  for(const [st,l,f,abs] of DROWS){
+    if(st==="hd"){h+=`<tr class="hd"><td class="l" colspan="7">${l}</td></tr>`;continue;}
+    const v=f(g,p);if(v==null)continue;
+    const w=qs[0]<0?null:f(g,qs[0]);const d=v==null||w==null?null:v-w;
+    h+=`<tr class="${st}"><td class="l">${l}</td><td>${v==null?"–":nf(v,1)}</td><td>${d==null?"–":`<span class="${d>0?"up":d<0?"down":""}">${(d>0?"+":"")+nf(d,1)}</span>`}</td>`+
+      qs.map(q=>abs?`<td class="muted">${q<0||v==null||f(g,q)==null?"–":(v-f(g,q)>0?"+":"")+nf(v-f(g,q),1)+" mlr"}</td>`:cell(q<0?null:pct(v,f(g,q)))).join("")+"</tr>";
+  }
+  $("degTable").innerHTML=h+"</tbody>";
+  const kr=M(1,1),mv=M(4,1),a=pct(kr(g,p),qs[0]<0?null:kr(g,qs[0])),b=pct(mv(g,p),qs[0]<0?null:mv(g,qs[0]));
+  const tpk=pct(raw(1,1,"TP",g,p),raw(1,1,"TP",g,qs[0])),ypk=pct(raw(1,1,"YP",g,p),raw(1,1,"YP",g,qs[0]));
+  $("degInsight").innerHTML=qs[0]<0?"":`${pLong(D.per[qs[0]])} → ${pLong(D.per[p])}: <b>${esc(D.grp[g])}</b> kredileri %${nf(a,2)} (TL %${nf(tpk,2)}, YP %${nf(ypk,2)}), mevduatı %${nf(b,2)} değişti.`;
+}
+
+// ---- banka grupları ----
+const yoy=f=>(g,p)=>{const q=cmpIdx(p,"yil");return q<0?null:pct(f(g,p),f(g,q))};
+const GCOLS=[{l:"Krediler",f:M(1,1)},{l:"Sektör payı (%)",share:1},{l:"Kredi büyümesi, yıllık (%)",f:yoy(M(1,1)),r:1,heat:1},
+ {l:"Mevduat",f:M(4,1)},{l:"Mevduat büyümesi, yıllık (%)",f:yoy(M(4,1)),r:1,heat:1},{l:"Kredi / mevduat (%)",f:KPI[8].f,r:1,heat:1},
+ {l:"Takip oranı (%)",f:NPL,r:1,heat:1},{l:"YP mevduat payı (%)",f:KPI[7].f,r:1,heat:1},{l:"Menkul değerler",f:M(3,1)}];
+function renderGroups(){
+  const p=S.p,sek=D.gi["Sektör"];const rows=GORDER.filter(([s,n])=>s==="sec"||n in D.gi);
+  const rng=GCOLS.map(c=>{if(!c.heat)return null;const xs=rows.filter(r=>r[0]!=="sec"&&r[1]!=="Sektör").map(r=>c.f(D.gi[r[1]],p)).filter(x=>x!=null&&isFinite(x));return xs.length?[Math.min(...xs),Math.max(...xs)]:null});
+  let h=`<thead><tr><th class="l">Grup</th>${GCOLS.map(c=>`<th>${c.l}${!c.r&&!c.share?"<br><span class='muted' style='font-weight:400'>milyar TL</span>":""}</th>`).join("")}</tr></thead><tbody>`;
+  for(const [st,n] of rows){
+    if(st==="sec"){h+=`<tr class="sec"><td class="l" colspan="${GCOLS.length+1}">${n}</td></tr>`;continue;}
+    const g=D.gi[n];
+    h+=`<tr class="${st}${g===S.g?" sel":""}" data-g="${g}"><td class="l">${esc(n)}</td>`+GCOLS.map((c,j)=>{
+      if(c.share){const a=M(1,1)(g,p),s=M(1,1)(sek,p);return `<td>${nf(ratio(a,s),1)}</td>`;}
+      const v=c.f(g,p);if(v==null||!isFinite(v))return "<td>–</td>";
+      const txt=c.r?nf(v,2):nf(v,0);
+      if(c.heat&&rng[j]&&n!=="Sektör"){const [lo,hi]=rng[j];const w=Math.round(10+(hi>lo?(v-lo)/(hi-lo):.5)*55);return `<td style="background:color-mix(in srgb, var(--heat-hi) ${w}%, var(--heat-lo));${w>45?"color:var(--heat-ink-hi)":""}">${txt}</td>`;}
+      return `<td>${txt}</td>`;}).join("")+"</tr>";
+  }
+  $("grTable").innerHTML=h+"</tbody>";
+  $("grTable").querySelectorAll("tr[data-g]").forEach(tr=>tr.onclick=()=>{S.g=+tr.dataset.g;$("kGrp").value=S.g;renderKpis();renderGroups();renderKpiChart();$("sec-ozet").scrollIntoView({behavior:"smooth"});});
+  const own=["Kamu","Yerli Özel","Yabancı"].filter(n=>n in D.gi&&sek!=null).map(n=>[n,ratio(M(1,1)(D.gi[n],p),M(1,1)(sek,p)),yoy(M(1,1))(D.gi[n],p)]);
+  $("grInsight").innerHTML=own.length?`${pLong(D.per[p])} itibarıyla kredilerin sahipliğe göre dağılımı: ${own.map(([n,s])=>`${n.toLocaleLowerCase("tr")} <b>%${nf(s,1)}</b>`).join(", ")}. Yıllık kredi büyümesi: ${own.map(([n,,y])=>`${n.toLocaleLowerCase("tr")} %${nf(y,1)}`).join(", ")}.`:"";
+}
+
+// ---- bülten tabloları ----
+const L=(l,f)=>({l,f});
+const share=(t,s,c)=>(g,p)=>ratio(raw(t,s,c,g,p),raw(t,s,"Toplam",g,p));
+const nplOf=(ts,ks)=>(g,p)=>{const a=raw(2,ts,"Toplam",g,p),k=raw(1,ks,"Toplam",g,p);return a==null||k==null||a+k===0?null:a/(a+k)*100};
+const sumM=(t,ss,c="Toplam")=>(g,p)=>{let x=0,n=0;for(const s of ss){const v=raw(t,s,c,g,p);if(v!=null){x+=v;n++}}return n?x/1000:null};
+const TSPEC={
+ 1:[{t:"line",h:"Ana kalemler",u:"milyar TL",s:[L("Toplam krediler",M(1,1)),L("Tüketici kr. ve bireysel kartlar",M(1,2)),L("Ticari ve diğer",M(1,10)),L("KOBİ",M(1,19))]},
+    {t:"line",h:"Yıllık büyüme",u:"%",sub:"52 haftalık değişim, nominal",s:[L("Toplam krediler",yoy(M(1,1))),L("TL krediler",yoy(M(1,1,"TP"))),L("YP krediler (TL karşılığı)",yoy(M(1,1,"YP"))),L("Tüketici ve bireysel kartlar",yoy(M(1,2)))]},
+    {t:"line",h:"Bireysel krediler",u:"milyar TL",s:[L("Konut",M(1,4)),L("Taşıt",M(1,5)),L("İhtiyaç",M(1,6)),L("Bireysel kredi kartları",M(1,7)),L("Kredili mevduat hesabı",M(1,21))]},
+    {t:"line",h:"TL ve YP krediler",u:"milyar TL",s:[L("TL",M(1,1,"TP")),L("YP (TL karşılığı)",M(1,1,"YP"))]},
+    {t:"grp",h:"Toplam krediler, gruplara göre",u:"milyar TL",f:M(1,1)},
+    {t:"grp",h:"Yıllık kredi büyümesi, gruplara göre",u:"%",f:yoy(M(1,1))}],
+ 2:[{t:"line",h:"Takipteki alacaklar",u:"milyar TL",s:[L("Toplam",M(2,1)),L("Tüketici kredileri",M(2,3)),L("Bireysel kredi kartları",M(2,7)),L("Ticari ve diğer",M(2,8)),L("KOBİ",M(2,12))]},
+    {t:"line",h:"Takip oranları",u:"%",sub:"takipteki / (canlı + takipteki)",s:[L("Toplam",NPL),L("Tüketici kredileri",nplOf(3,3)),L("Bireysel kredi kartları",nplOf(7,7)),L("Ticari ve diğer",nplOf(8,10)),L("KOBİ",nplOf(12,19)),L("İhtiyaç",nplOf(6,6))]},
+    {t:"grp",h:"Takip oranı, gruplara göre",u:"%",f:NPL},
+    {t:"line",h:"Özel karşılıkların takipteki alacaklara oranı",u:"%",s:[L("Karşılık oranı",(g,p)=>{const a=raw(2,9,"Toplam",g,p),b=raw(2,1,"Toplam",g,p);return a==null||!b?null:Math.abs(a)/b*100})]}],
+ 3:[{t:"line",h:"Toplam menkul değerler: TL ve YP",u:"milyar TL",s:[L("Toplam",M(3,1)),L("TL",M(3,1,"TP")),L("YP (TL karşılığı)",M(3,1,"YP"))]},
+    {t:"line",h:"Değerleme sınıflarına göre",u:"milyar TL",sub:"eski ve yeni kırılım birleştirildi",s:[L("Gerçeğe uygun değer, K/Z",M(3,[2,14])),L("Gerçeğe uygun değer, diğer kapsamlı gelir",M(3,[5,17])),L("İtfa edilmiş maliyet",M(3,[8,20]))]},
+    {t:"line",h:"Repo, teminat ve Eurobond",u:"milyar TL",s:[L("Repoya konu",M(3,11)),L("Teminata verilen",M(3,12)),L("Eurobondlar",M(3,13))]},
+    {t:"grp",h:"Menkul değerler, gruplara göre",u:"milyar TL",f:M(3,1)}],
+ 4:[{t:"line",h:"Mevduat: TL ve YP",u:"milyar TL",s:[L("Toplam",M(4,1)),L("TL",M(4,1,"TP")),L("YP (TL karşılığı)",M(4,1,"YP")),L("Kur korumalı",M(4,12))]},
+    {t:"line",h:"Mevduat sahiplerine göre",u:"milyar TL",s:[L("Gerçek kişiler",M(4,2)),L("Ticari kuruluşlar",M(4,5)),L("Resmi ve diğer",M(4,8))]},
+    {t:"line",h:"YP payı ve vadesiz payı",u:"%",s:[L("YP payı, toplam",share(4,1,"YP")),L("YP payı, gerçek kişiler",share(4,2,"YP")),L("Vadesiz payı",(g,p)=>{const v=[3,6,9].reduce((x,s)=>x+(raw(4,s,"Toplam",g,p)||0),0),t=raw(4,1,"Toplam",g,p);return ratio(v,t)})]},
+    {t:"line",h:"Yıllık büyüme",u:"%",sub:"52 haftalık değişim, nominal",s:[L("Toplam",yoy(M(4,1))),L("TL",yoy(M(4,1,"TP"))),L("YP (TL karşılığı)",yoy(M(4,1,"YP")))]},
+    {t:"grp",h:"Mevduat, gruplara göre",u:"milyar TL",f:M(4,1)},
+    {t:"line",h:"Sigortaya tabi mevduat",u:"milyar TL",s:[L("Sigortaya tabi",M(4,11))]}],
+ 5:[{t:"line",h:"Likit varlıklar",u:"milyar TL",s:[L("Nakit değerler",M(5,1)),L("TCMB’den alacaklar",M(5,2)),L("Zorunlu karşılıklar",M(5,4)),L("Para piyasalarından alacaklar",M(5,3)),L("Bankalardan alacaklar",M(5,5))]},
+    {t:"line",h:"Mevduat dışı fonlama",u:"milyar TL",s:[L("Bankalara borçlar",M(5,10)),L("Repo",M(5,13)),L("TCMB’ye borçlar",M(5,8)),L("İhraç edilen menkul kıymetler",M(5,14)),L("Para piyasalarına borçlar",M(5,9))]},
+    {t:"line",h:"Bankalara borçlar: yurt içi ve yurt dışı",u:"milyar TL",s:[L("Yurt içi bankalar",M(5,11)),L("Yurt dışı bankalar",M(5,12))]},
+    {t:"grp",h:"TCMB’ye borçlar, gruplara göre",u:"milyar TL",f:M(5,8)}],
+ 6:[{t:"line",h:"Bilanço dışı işlemler",u:"milyar TL",s:[L("Gayrinakdi krediler",M(6,1)),L("Türev finansal araçlar",M(6,3)),L("Diğer taahhütler",M(6,4))]},
+    {t:"grp",h:"Gayrinakdi krediler, gruplara göre",u:"milyar TL",f:M(6,1)}],
+ 7:[{t:"line",h:"Saklanan menkul değerler (nominal)",u:"milyar TL",s:[L("Toplam",M(7,1)),L("Yurt içi yerleşikler",M(7,2)),L("Yurt dışı yerleşikler",M(7,24))]},
+    {t:"line",h:"Yurt içi yerleşikler, sahiplerine göre",u:"milyar TL",s:[L("Gerçek kişiler",M(7,3)),L("Sigorta şirketleri",M(7,7)),L("Diğer tüzel kişiler",M(7,11)),L("Bankalar",M(7,15)),L("Diğer mali kuruluşlar",M(7,19))]},
+    {t:"line",h:"Yurt içi gerçek kişiler",u:"milyar TL",s:[L("Kamu borçlanma senetleri",M(7,4)),L("Eurobondlar",M(7,5)),L("Diğer",M(7,6))]},
+    {t:"bar",h:"Yurt içi yerleşikler, kıymet türüne göre, seçilen hafta",u:"milyar TL",s:[L("Kamu borçlanma senetleri",sumM(7,[4,8,12,16,20])),L("Eurobondlar",sumM(7,[5,9,13,17,21])),L("Diğer",sumM(7,[6,10,14,18,22]))]}],
+ 8:[{t:"line",h:"Saklanan menkul değerler (piyasa değeri)",u:"milyar TL",s:[L("Toplam",M(8,1)),L("Yurt içi yerleşikler",M(8,2)),L("Yurt dışı yerleşikler",M(8,24))]},
+    {t:"line",h:"Yurt dışı yerleşiklerin elindeki kıymetler",u:"milyar TL",sub:"piyasa değeri",s:[L("Kamu borçlanma senetleri",sumM(8,[26,30,34,38,42])),L("Eurobondlar",sumM(8,[27,31,35,39,43])),L("Diğer (hisse senedi vb.)",sumM(8,[28,32,36,40,44]))]},
+    {t:"line",h:"Yurt içi gerçek kişiler",u:"milyar TL",sub:"piyasa değeri",s:[L("Kamu borçlanma senetleri",M(8,4)),L("Eurobondlar",M(8,5)),L("Diğer",M(8,6))]},
+    {t:"line",h:"Yurt dışı yerleşiklerin KBS payı",u:"%",sub:"yurt dışı yerleşiklerin kamu borçlanma senetleri / tüm saklanan KBS",s:[L("Pay",(g,p)=>{const a=sumM(8,[26,30,34,38,42])(g,p),b=sumM(8,[4,8,12,16,20,26,30,34,38,42])(g,p);return ratio(a,b)})]}],
+ 9:[{t:"line",h:"Yabancı para pozisyonu",u:"milyar TL",sub:"eski ve yeni kalemler birleştirildi",s:[L("Net genel pozisyon",M(9,[7,17])),L("Bilanço içi pozisyon",M(9,[1,11])),L("Bilanço dışı pozisyon",M(9,[4,14]))]},
+    {t:"line",h:"Net genel pozisyon / yasal özkaynak",u:"%",s:[L("Oran",(g,p)=>ratio(rawAny(9,[7,17],"Toplam",g,p),rawAny(9,[8,18],"Toplam",g,p)))]},
+    {t:"line",h:"Bilanço içi ve dışı döviz varlık/yükümlülükleri",u:"milyar TL",s:[L("Bilanço içi varlıklar",M(9,[2,12])),L("Bilanço içi yükümlülükler",M(9,[3,13])),L("Bilanço dışı varlıklar",M(9,[5,15])),L("Bilanço dışı yükümlülükler",M(9,[6,16]))]},
+    {t:"grp",h:"Net genel pozisyon, gruplara göre",u:"milyar TL",f:M(9,[7,17])}],
+};
+const decFor=u=>u==="%"?2:1;
+function drawTChart(cv){
+  const [no,j]=cv.dataset.c.split(":").map(Number);const sp=TSPEC[no][j];const key=cv.dataset.c;
+  if(tCharts[key]){tCharts[key].destroy();delete tCharts[key];}
+  const g=S.tg,dec=decFor(sp.u);let cfg;
+  if(sp.t==="bar"){
+    const rows=sp.s.map(s=>[s.l,s.f(g,S.p)]).filter(r=>r[1]!=null);const ink=css("--ink-2"),line=css("--line");
+    cv.parentElement.style.height=Math.max(160,rows.length*30+50)+"px";
+    cfg={type:"bar",data:{labels:rows.map(r=>r[0]),datasets:[{data:rows.map(r=>r[1]),backgroundColor:PAL[0],borderRadius:3,barPercentage:.8}]},
+      options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${nf(c.parsed.x,dec)} ${sp.u}`}}},scales:{x:{ticks:{color:ink,callback:v=>nf(v,0)},grid:{color:line}},y:{ticks:{color:ink},grid:{display:false}}}}};
+  }else{
+    const p0=rngStart(),ps=[];for(let p=p0;p<D.np;p++)ps.push(p);const labels=ps.map(p=>pShort(D.per[p]));
+    const sets=sp.t==="grp"?[...S.kg].sort((a,b)=>a-b).map(gg=>({label:D.grp[gg],data:ps.map(p=>sp.f(gg,p)),borderColor:gcol(gg),backgroundColor:gcol(gg),borderWidth:D.grp[gg]==="Sektör"?3:2}))
+      :sp.s.map((s,k)=>({label:s.l,data:ps.map(p=>s.f(g,p)),borderColor:PAL[k%PAL.length],backgroundColor:PAL[k%PAL.length]}));
+    cfg={type:"line",data:{labels,datasets:sets.filter(d=>d.data.some(x=>x!=null))},options:chartOpts(sp.u,dec,true)};
+  }
+  tCharts[key]=new Chart(cv,cfg);
+}
+function tSub(sp){const per=sp.t==="bar"?pLong(D.per[S.p]):`${pLong(D.per[rngStart()])} – ${pLong(D.per[D.np-1])}`;
+  return `${sp.u} · ${sp.t==="grp"?"işaretli gruplar":D.grp[S.tg]} · ${per}${sp.sub?" · "+sp.sub:""}`;}
+let tObs;
+function buildTSecs(){
+  $("tToc").innerHTML=D.tab.map(t=>`<a href="#tb-${t.no}">${t.no}. ${esc(t.ad)}</a>`).join("");
+  $("tSecs").innerHTML=D.tab.map(t=>{const sps=TSPEC[t.no]||[];
+    return `<div class="tsec" id="tb-${t.no}"><div class="tsec-h"><h3>${t.no}. ${esc(t.ad)}</h3><span class="muted">milyon TL · ${t.items.length} kalem</span></div>
+    <div class="cgrid">${sps.map((sp,j)=>`<div class="cpanel${sps.length%2&&j===sps.length-1?" wide":""}"><h4>${esc(sp.h)}</h4><div class="csub" data-sub="${t.no}:${j}">${esc(tSub(sp))}</div><div class="chartbox"><canvas data-c="${t.no}:${j}"></canvas></div></div>`).join("")}</div>
+    <details class="ttab" data-t="${t.no}" data-v="grup"><summary>Tablonun tamamı: ${esc(t.ad)}, ${t.items.length} kalem</summary><div class="ttab-in"></div></details></div>`}).join("");
+  tObs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){drawTChart(e.target);tObs.unobserve(e.target);}}),{rootMargin:"300px"});
+  $("tSecs").querySelectorAll("canvas[data-c]").forEach(c=>tObs.observe(c));
+  $("tSecs").querySelectorAll("details.ttab").forEach(d=>d.addEventListener("toggle",()=>{if(d.open)renderTTab(d);}));
+}
+function refreshTSecs(){
+  if(!D._t)return;
+  $("tSecs").querySelectorAll("[data-sub]").forEach(el=>{const [no,j]=el.dataset.sub.split(":").map(Number);el.textContent=tSub(TSPEC[no][j]);});
+  $("tSecs").querySelectorAll("canvas[data-c]").forEach(c=>{if(tCharts[c.dataset.c])drawTChart(c);});
+  $("tSecs").querySelectorAll("details.ttab[open]").forEach(renderTTab);
+}
+function lvl(ad){if(/^[a-zçğıöşü]\)\s/i.test(ad))return 1;if(/^-\s/.test(ad))return 1;return 0;}
+const bold=ad=>/^Toplam |^Mevduat \(|^Takipteki Alacaklar \(|^Bankalarda Saklanan|^Yabancı Para Net/.test(ad);
+function renderTTab(d){
+  const t=T[+d.dataset.t],box=d.querySelector(".ttab-in"),c=d.dataset.col||t.cols[t.cols.length-1],v=d.dataset.v;
+  const gs=GORDER.filter(([s,n])=>s!=="sec"&&n in D.gi).map(([s,n])=>D.gi[n]);
+  let cols;
+  if(v==="grup")cols=gs.map(g=>({g,p:S.p,l:D.grp[g]}));else{cols=[];for(let p=Math.max(0,S.p-12);p<=S.p;p++)cols.push({g:S.tg,p,l:pShort(D.per[p])});}
+  const ctl=`<div class="ttab-ctl"><div class="seg" role="group"><button type="button" data-v="grup" aria-pressed="${v==="grup"}">Gruplar yan yana</button><button type="button" data-v="zaman" aria-pressed="${v!=="grup"}">Son 13 hafta · ${esc(D.grp[S.tg])}</button></div>
+    ${t.cols.length>1?`<label>Sütun <select data-tc>${t.cols.map(x=>`<option ${x===c?"selected":""}>${x}</option>`).join("")}</select></label>`:""}<span class="muted">${v==="grup"?pLong(D.per[S.p]):""} · milyon TL</span></div>`;
+  let h=`${ctl}<div class="scroll"><table class="xt2"><thead><tr><th>Kalem</th>${cols.map(x=>`<th>${esc(x.l)}</th>`).join("")}</tr></thead><tbody>`;
+  for(const it of t.items){const eski=it.son<D.np-1;
+    h+=`<tr class="l${lvl(it.ad)}${bold(it.ad)?" b":""}"><td><span class="xn">${esc(it.ad)}${eski?`<span class="oldtag">eski yapı · ${pShort(D.per[it.ilk])}–${pShort(D.per[it.son])}</span>`:""}</span></td>`+
+      cols.map(x=>{const y=raw(t.no,it.s,c,x.g,x.p);return y==null?`<td class="nil">–</td>`:`<td class="${y<0?"neg":""}">${nf(y,0)}</td>`}).join("")+"</tr>";}
+  box.innerHTML=h+"</tbody></table></div>";
+  box.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{d.dataset.v=b.dataset.v;renderTTab(d);});
+  const s=box.querySelector("[data-tc]");if(s)s.onchange=()=>{d.dataset.col=s.value;renderTTab(d);};
+}
+
+// ---- dönem ve başlatma ----
+function setPeriod(p){S.p=Math.max(0,Math.min(D.np-1,p));$("pSel").value=S.p;$("pPrev").disabled=S.p===0;$("pNext").disabled=S.p===D.np-1;
+  const q=cmpIdx(S.p);$("pNote").textContent=q<0?"Karşılaştırma haftası arşivde yok":`${pLong(D.per[S.p])} ↔ ${pLong(D.per[q])}`;
+  renderKpis();renderDeg();renderGroups();refreshTSecs();}
+function segWire(el,attr,cb){el.querySelectorAll("button").forEach(b=>b.onclick=()=>{el.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));cb(b.dataset[attr]);});}
+function init(){
+  $("pSel").innerHTML=D.per.map((p,i)=>[p,i]).reverse().map(([p,i])=>`<option value="${i}">${pLong(p)}</option>`).join("");
+  const go=GORDER.filter(([s,n])=>s!=="sec"&&n in D.gi).map(([s,n])=>`<option value="${D.gi[n]}">${s==="sub"?" ":""}${esc(n)}</option>`).join("");
+  ["kGrp","dGrp","tGrp"].forEach(id=>{$(id).innerHTML=go;$(id).value=S.g;});
+  $("kGrp").onchange=()=>{S.g=+$("kGrp").value;renderKpis();renderGroups();};
+  $("dGrp").onchange=()=>{S.dg=+$("dGrp").value;renderDeg();};
+  $("tGrp").onchange=()=>{S.tg=+$("tGrp").value;refreshTSecs();};
+  $("mDate").textContent=$("fDate").textContent=D.meta.guncelleme;
+  $("pSel").onchange=()=>setPeriod(+$("pSel").value);$("pPrev").onclick=()=>setPeriod(S.p-1);$("pNext").onclick=()=>setPeriod(S.p+1);
+  segWire($("cmpSeg"),"c",v=>{S.cmp=v;setPeriod(S.p);});
+  document.querySelectorAll(".rngSeg").forEach(el=>segWire(el,"r",v=>{S.rng=v;document.querySelectorAll(".rngSeg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.r===v));renderKpiChart();refreshTSecs();}));
+  groupChecks("kpiGroups");groupChecks("tGroups");buildTSecs();D._t=1;setPeriod(D.np-1);renderKpiChart();
+}
+const ready=load();
+document.querySelectorAll("#landing .choice").forEach(b=>b.onclick=async()=>{
+  await ready;$("landing").hidden=true;$("app").hidden=false;if(!D._init){init();D._init=1;}
+  window.scrollTo(0,0);if(b.dataset.go!=="sec-ozet")setTimeout(()=>$(b.dataset.go).scrollIntoView(),30);});
+$("homeBtn").onclick=()=>{$("app").hidden=true;$("landing").hidden=false;window.scrollTo(0,0);};
+$("themeBtn").onclick=()=>{const r=document.documentElement;const dark=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;r.dataset.theme=dark?"light":"dark";if(D&&D._init){renderKpiChart();refreshTSecs();}};
+window.addEventListener("scroll",()=>$("appbar").classList.toggle("lift",scrollY>8),{passive:true});
+ready.catch(e=>{$("landFoot").insertAdjacentHTML("beforebegin",`<p class="loading">Veri açılamadı: ${esc(e.message)}. Güncel bir tarayıcı (Chrome, Edge, Firefox, Safari 16.4+) gerekir.</p>`)});
+</script>
+</body>
+</html>

@@ -140,6 +140,7 @@ def main():
     html = (html.replace("{{ARALIK_DEN_YA}}", f"{AYLAR[m0 - 1]} {yil_den(y0)} {AYLAR[m1 - 1]} {yil_e(y1)}")
                 .replace("{{ARALIK}}", f"{AYLAR[m0 - 1]} {y0} – {AYLAR[m1 - 1]} {y1}")
                 .replace("{{N}}", str(len(D["per"])))
+                .replace("{{HAFTALIK_LINK}}", "haftalik.html")
                 .replace("{{VERI}}", b64))
     out = Path(a.cikti)
     out.parent.mkdir(parents=True, exist_ok=True)

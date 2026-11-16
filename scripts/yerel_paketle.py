@@ -1,4 +1,4 @@
-"""rapor_sablonu.html ve Chart.js'i yerel/bddk_indir.py içine gömer (gzip + base64).
+"""rapor şablonlarını ve Chart.js'i yerel/bddk_indir.py içine gömer (gzip + base64).
 
 Şablon ya da Chart.js değiştiğinde çalıştırın:  python scripts/yerel_paketle.py
 """
@@ -17,6 +17,7 @@ def gom(yol):
 
 s = HEDEF.read_text("utf-8")
 for ad, etiket, kaynak in [("SABLON_GZ_B64", "<<SABLON>>", KOK / "rapor_sablonu.html"),
+                           ("HSABLON_GZ_B64", "<<HSABLON>>", KOK / "rapor_haftalik_sablonu.html"),
                            ("CHARTJS_GZ_B64", "<<CHARTJS>>", KOK / "yerel" / "vendor" / "chart.umd.min.js")]:
     s, n = re.subn(rf'^{ad} = ".*"  # {etiket}$', f'{ad} = "{gom(kaynak)}"  # {etiket}', s, flags=re.M)
     assert n == 1, ad

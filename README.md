@@ -29,9 +29,11 @@ Kurulum gerektirmeyen (yalnız Python standart kütüphanesi) tek dosyalık beti
 
 Şablon (`rapor_sablonu.html`) ya da Chart.js değiştiğinde betiğe yeniden gömmek için: `python scripts/yerel_paketle.py`. Chart.js 4.4.1 MIT lisanslıdır (`yerel/vendor/`).
 
-## Rapor (`docs/index.html`)
+## Raporlar (`docs/index.html` aylık, `docs/haftalik.html` haftalık)
 
 Tek dosyalık etkileşimli rapor (TBB raporuyla aynı tasarım): özet göstergeler ve uzun dönem grafikleri, banka gruplarının karşılaştırması, bilanço yapısı ve 17 tablonun bütün kalemlerini gezme (gruplar yan yana / zaman serisi, kalem grafiği, CSV indirme). `scripts/rapor_olustur.py` veriden üretir; iş akışı veri değiştiğinde yeniden üretir.
+
+Haftalık rapor (`rapor_haftalik_sablonu.html`, `scripts/rapor_haftalik_olustur.py`): özet göstergeler (TL/YP ayrımıyla), "bu hafta ne değişti" tablosu (haftalık, 4 hafta, yılbaşından, yıllık), banka grupları ve 9 tablo bölüm bölüm grafikler; grafik aralığı 1 yıl / 3 yıl / tümü. Veri yapısı `yerel/bddk_indir.py` içindeki ortak fonksiyonlardan gelir; değerler milyon TL'ye yuvarlanır. Haftalık iş akışı veri değiştiğinde yeniden üretir. İki rapor birbirine bağlantılıdır.
 
 Rasyolar tablosundaki kâr, gelir ve gider içeren oranlar BDDK'da yıl başından birikimlidir; özet göstergelerde 12/ay ile yıllıklaştırılır.
 
