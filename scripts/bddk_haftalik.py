@@ -130,11 +130,16 @@ def hucreler(satir):
 def ayristir(sayfa, tablo_no, tablo_ad, kalemler):
     """TabloExcelGelismis2 (tam hassasiyet) -> kayıt listesi."""
     m = re.search(r'<table[^>]*id="TabloExcelGelismis2".*?</table>', sayfa, re.S)
-    satirlar = re.findall(r"<tr.*?</tr>", m.group(0), re.S)
+    satirlar = [r for r in re.findall(r"<tr.*?</tr>", m.group(0), re.S) if hucreler(r)]
     ust = hucreler(satirlar[0])
     alt = [h for h, _ in hucreler(satirlar[1])]
-    # başlık: ilk hücre "Birim: ...", sonra her kalem için colspan kadar sütun (TP / YP / TOPLAM)
-    gruplar = ust[1:]
+    # başlık: ilk hücre "Birim: ...", sonra her kalem için ad hücresi + (colspan ya da boş hücrelerle) sütunlar
+    gruplar = []
+    for ad, cs in ust[1:]:
+        if ad:
+            gruplar.append([ad, cs])
+        elif gruplar:
+            gruplar[-1][1] += cs
     adlar = [a.split(" / ", 1)[-1] for a, _ in gruplar]
     beklenen = [a for _, a in kalemler]
     if len(adlar) != len(beklenen) or any(re.sub(r"\s+", "", x) != re.sub(r"\s+", "", y) for x, y in zip(adlar, beklenen)):
