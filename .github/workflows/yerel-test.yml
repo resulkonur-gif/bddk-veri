@@ -4,20 +4,22 @@ on:
     branches: [yerel-test2]
 jobs:
   test:
-    strategy:
-      matrix:
-        os: [windows-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.13"}
-      - name: aylik + otomatik rapor
+      - name: ilk indirme (2026-08 aylik, 2026 haftalik yalniz tablo 1)
         shell: bash
-        run: python -I yerel/bddk_indir.py aylik --baslangic 2026-07 --bitis 2026-09
-      - name: menu 5
+        run: |
+          python -I yerel/bddk_indir.py aylik --baslangic 2026-08 --bitis 2026-08 | grep -vE " tamam$"
+          python -I yerel/bddk_indir.py haftalik --baslangic 2026 --bitis 2026 --tablolar 1
+      - name: guncelle (yalniz eksikler inmeli)
         shell: bash
-        run: printf "5\n\n" | python -I yerel/bddk_indir.py | tail -5
+        run: python -I yerel/bddk_indir.py guncelle
+      - name: tekrar guncelle (is olmamali)
+        shell: bash
+        run: printf "1\n\n" | python -I yerel/bddk_indir.py
       - name: kontrol
         shell: bash
-        run: ls -la yerel/BDDK_Veri yerel/BDDK_Veri/aylik && grep -c "Chart.js v4.4.1" yerel/BDDK_Veri/BDDK_Aylik_Rapor.html && ! grep -q "cdnjs" yerel/BDDK_Veri/BDDK_Aylik_Rapor.html && echo "CDN bagimliligi yok"
+        run: ls yerel/BDDK_Veri yerel/BDDK_Veri/aylik yerel/BDDK_Veri/haftalik; cat yerel/BDDK_Veri/eksikler.txt 2>/dev/null || echo "eksikler.txt yok"
