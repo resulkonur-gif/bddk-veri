@@ -1,0 +1,51 @@
+name: yerel betik testi
+on:
+  push:
+    branches: [yerel-test]
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.13"}
+      - name: paket olmadığını doğrula
+        shell: bash
+        run: python -c "import importlib.util as u; print('requests',u.find_spec('requests') is not None,'pandas',u.find_spec('pandas') is not None,'openpyxl',u.find_spec('openpyxl') is not None)"
+      - name: aylik
+        shell: bash
+        run: |
+          python -I yerel/bddk_indir.py aylik
+          python -I yerel/bddk_indir.py aylik --baslangic 2026-08 --bitis 2026-09 --tablolar 1,9
+      - name: haftalik
+        shell: bash
+        run: python -I yerel/bddk_indir.py haftalik --baslangic 2025 --bitis 2026 --tablolar 1,9
+      - name: menu
+        shell: bash
+        run: printf "3\n\n" | python -I yerel/bddk_indir.py | tail -6
+      - name: kontrol
+        shell: bash
+        env: {PYTHONIOENCODING: utf-8}
+        run: |
+          pip install -q openpyxl pandas
+          python - <<'PY'
+          import pandas as pd, glob
+          from openpyxl import load_workbook
+          a=pd.read_csv('yerel/BDDK_Veri/aylik/bddk_aylik_2026.csv',encoding='utf-8-sig',dtype={'donem':str})
+          r=pd.read_csv('veri/aylik/uzun/bddk_aylik_2026.csv',encoding='utf-8-sig',dtype={'donem':str})
+          m=a.merge(r,on=['donem','tablo_no','grup','sira','sutun'],suffixes=('','_r'))
+          print('AYLIK satir',len(a),'eslesen',len(m),'max fark',(m.deger-m.deger_r).abs().max(),'tablolar',sorted(a.tablo_no.unique()))
+          h=pd.read_csv('yerel/BDDK_Veri/haftalik/bddk_haftalik_2026.csv',encoding='utf-8-sig',dtype={'tarih':str})
+          rh=pd.read_csv('veri/haftalik/csv/bddk_haftalik_2026.csv',encoding='utf-8-sig',dtype={'tarih':str})
+          import json
+          meta=json.load(open('veri/haftalik/kalemler.json',encoding='utf-8'))
+          sira={(int(n),k['id']):k['sira'] for n,t in meta.items() for k in t['kalemler']}
+          rh['sira']=[sira[(t,k)] for t,k in zip(rh.tablo_no,rh.kalem_id)]
+          mh=h.merge(rh,on=['tarih','tablo_no','grup','sira'],suffixes=('','_r'))
+          print('HAFTALIK satir',len(h),'eslesen',len(mh),'max fark',max((mh[c]-mh[c+'_r']).abs().max() for c in ['TP','YP','Toplam']))
+          for f in sorted(glob.glob('yerel/BDDK_Veri/*/*.xlsx')):
+              wb=load_workbook(f,read_only=True); print(f.split('/')[-1], [(ws.title, ws.max_row) for ws in wb.worksheets][:3])
+          PY
