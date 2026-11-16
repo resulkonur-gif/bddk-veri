@@ -23,6 +23,12 @@ Notlar:
 - Bazı kalemler yalnız belli dönemlerde vardır (ör. menkul değerlerin eski kırılımı 2022/09'a, eski YP pozisyonu kalemleri 2023/01'e kadar; KKM 2022/02–2026/09; kredili mevduat hesapları 2022/09'dan itibaren).
 - `.github/workflows/bddk-haftalik.yml` her gün çalışır; yeni hafta yayımlandıysa son 13 haftayı (revizyonlar için) yeniden çeker. Elle çalıştırırken yıl aralığı verilebilir.
 
+## Yerel indirici (`yerel/bddk_indir.py`)
+
+Kurulum gerektirmeyen (yalnız Python standart kütüphanesi) tek dosyalık betik: aylık ve haftalık bülteni indirir, CSV + Excel yazar, aylık verilerden aynı HTML raporu üretir (`BDDK_Veri/BDDK_Aylik_Rapor.html`; Chart.js gömülü, internet gerektirmez). Çift tıklayınca menüyle, komut satırında `aylik`, `haftalik`, `rapor` alt komutlarıyla çalışır.
+
+Şablon (`rapor_sablonu.html`) ya da Chart.js değiştiğinde betiğe yeniden gömmek için: `python scripts/yerel_paketle.py`. Chart.js 4.4.1 MIT lisanslıdır (`yerel/vendor/`).
+
 ## Rapor (`docs/index.html`)
 
 Tek dosyalık etkileşimli rapor (TBB raporuyla aynı tasarım): özet göstergeler ve uzun dönem grafikleri, banka gruplarının karşılaştırması, bilanço yapısı ve 17 tablonun bütün kalemlerini gezme (gruplar yan yana / zaman serisi, kalem grafiği, CSV indirme). `scripts/rapor_olustur.py` veriden üretir; iş akışı veri değiştiğinde yeniden üretir.
