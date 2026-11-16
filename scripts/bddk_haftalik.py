@@ -19,6 +19,7 @@ import html
 import json
 import re
 import sys
+import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime, timedelta, timezone
@@ -171,18 +172,29 @@ def yil_parcalari(tarihler, yillar):
 
 
 def cek(parcalar, tablolar, paralel):
-    oturumlar = [Oturum() for _ in range(paralel)]
+    yerel = threading.local()
     isler = [(y, b, e, n) for y, b, e in parcalar for n in tablolar]
     sonuc = []
 
-    def is_yap(k, y, b, e, n):
-        o = oturumlar[k % paralel]
+    def is_yap(y, b, e, n):
+        if not hasattr(yerel, "o"):
+            yerel.o = Oturum()
         t = tablolar[n]
-        s = o.rapor(b, e, [i for i, _ in t["kalemler"]])
-        return y, n, ayristir(s, n, t["ad"], t["kalemler"])
+        for k in range(3):
+            s = yerel.o.rapor(b, e, [i for i, _ in t["kalemler"]])
+            try:
+                return y, n, ayristir(s, n, t["ad"], t["kalemler"])
+            except RuntimeError as hata:
+                print(f"  {y} tablo {n}: deneme {k + 1} başarısız ({str(hata).splitlines()[0]})", flush=True)
+                if k == 2:
+                    m = re.search(r'<table[^>]*id="TabloExcelGelismis2".*?</table>', s, re.S)
+                    print((m.group(0) if m else s)[:3000], flush=True)
+                    raise
+                time.sleep(5)
+                yerel.o = Oturum()
 
     with ThreadPoolExecutor(paralel) as ex:
-        fs = [ex.submit(is_yap, k, *i) for k, i in enumerate(isler)]
+        fs = [ex.submit(is_yap, *i) for i in isler]
         for f in as_completed(fs):
             y, n, kayit = f.result()
             sonuc += kayit
