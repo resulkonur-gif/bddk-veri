@@ -9,7 +9,7 @@ Kullanım:
   python scripts/bddk_haftalik.py --guncelle                       # yeni hafta varsa son 13 haftayı yenile
 
 Çıktılar:
-  veri/haftalik/uzun/bddk_haftalik_<yıl>.csv  tarih,tablo_no,tablo,grup,kalem_id,sira,kalem,sutun,deger
+  veri/haftalik/csv/bddk_haftalik_<yıl>.csv   tarih,tablo_no,grup,kalem_id,TP,YP,Toplam (adlar kalemler.json'da)
   veri/haftalik/excel/BDDK_Haftalik_Arsiv_<yıl>.xlsx
   veri/haftalik/kalemler.json                 tablolar ve kalemleri (id, sıra, ad)
   veri/haftalik/son_tarih.txt                 arşivdeki en son hafta
@@ -37,6 +37,8 @@ GRUP_SIRA = ["Sektör", "Mevduat", "Mevduat-Kamu", "Mevduat-Yerli Özel", "Mevdu
 SUTUNLAR = ["TP", "YP", "Toplam"]
 KOK = Path(__file__).resolve().parent.parent / "veri" / "haftalik"
 UZUN = ["tarih", "tablo_no", "tablo", "grup", "kalem_id", "sira", "kalem", "sutun", "deger"]
+GENIS = ["tarih", "tablo_no", "grup", "kalem_id"] + SUTUNLAR
+YALNIZ_TOPLAM = {9}  # Yabancı Para Pozisyonu: BDDK yalnız Toplam sütununu dolduruyor
 UA = "Mozilla/5.0 (bddk-veri arsiv; github.com/resulkonur-gif/bddk-veri)"
 
 
@@ -207,38 +209,52 @@ def cek(parcalar, tablolar, paralel):
     return pd.DataFrame(sonuc, columns=UZUN)
 
 
-def kontrol(df):
-    sorun = sorted(set(df.grup.dropna()) - set(GRUP_SIRA))
+def genislet(uzun):
+    w = uzun.pivot_table(index=["tarih", "tablo_no", "grup", "kalem_id"], columns="sutun", values="deger",
+                         aggfunc="first").reindex(columns=SUTUNLAR).reset_index()
+    w.loc[w.tablo_no.isin(YALNIZ_TOPLAM), ["TP", "YP"]] = float("nan")
+    return w.dropna(subset=SUTUNLAR, how="all")[GENIS]
+
+
+def kontrol(w):
+    sorun = sorted(set(w.grup.dropna()) - set(GRUP_SIRA))
     if sorun:
         print(f"  UYARI: beklenmeyen grup adları: {sorun}", flush=True)
-    d = df[(df.tablo_no == 1) & (df.kalem_id == df[df.tablo_no == 1].kalem_id.min())]
-    p = d.pivot_table(index=["tarih", "grup"], columns="sutun", values="deger", aggfunc="first")
-    if {"TP", "YP", "Toplam"} <= set(p.columns):
-        fark = (p.TP + p.YP - p.Toplam).abs().max()
-        print(f"  Kontrol: Toplam Krediler TP+YP-Toplam en büyük fark {fark:.4f}", flush=True)
+    d = w.dropna(subset=SUTUNLAR)
+    fark = (d.TP + d.YP - d.Toplam).abs()
+    print(f"  Kontrol: TP+YP≠Toplam olan satır {(fark > 0.01).sum()} / {len(d)}", flush=True)
 
 
-def kaydet(yeni):
-    yeni = yeni.copy()
-    yeni["yil"] = yeni.tarih.str[:4]
+def csv_yolu(yil):
+    return KOK / "csv" / f"bddk_haftalik_{yil}.csv"
+
+
+def kaydet(w):
+    w = w.copy()
+    w["yil"] = w.tarih.str[:4]
     gs = {g: i for i, g in enumerate(GRUP_SIRA)}
-    for yil, d in yeni.groupby("yil"):
-        yol = KOK / "uzun" / f"bddk_haftalik_{yil}.csv"
+    for yil, d in w.groupby("yil"):
+        yol = csv_yolu(yil)
         yol.parent.mkdir(parents=True, exist_ok=True)
-        d = d[UZUN]
+        d = d[GENIS]
         if yol.exists():
             eski = pd.read_csv(yol, encoding="utf-8-sig", dtype={"tarih": str})
             anahtar = set(zip(d.tarih, d.tablo_no))
             eski = eski[[(t, n) not in anahtar for t, n in zip(eski.tarih, eski.tablo_no)]]
             d = pd.concat([eski, d])
-        d = d.assign(_g=d.grup.map(gs).fillna(99), _s=d.sutun.map({s: i for i, s in enumerate(SUTUNLAR)}))
-        d = d.sort_values(["tarih", "tablo_no", "_g", "sira", "_s"], kind="stable").drop(columns=["_g", "_s"])
-        d.to_csv(yol, index=False, encoding="utf-8-sig", float_format="%.5f")
-    return sorted(yeni.yil.unique())
+        d = d.assign(_g=d.grup.map(gs).fillna(99))
+        d = d.sort_values(["tarih", "tablo_no", "_g", "kalem_id"], kind="stable").drop(columns="_g")
+        d.to_csv(yol, index=False, encoding="utf-8-sig")
+    return sorted(w.yil.unique())
 
 
-def excel_yaz(yil, tablolar):
-    df = pd.read_csv(KOK / "uzun" / f"bddk_haftalik_{yil}.csv", encoding="utf-8-sig", dtype={"tarih": str})
+def sayfa_adi(ad):
+    ad = re.sub(r"[\\/*?:\[\]]", "", ad).replace("Bankalarda Saklanan ", "Saklanan ")
+    return ad if len(ad) <= 31 else ad[:31]
+
+
+def excel_yaz(yil, meta):
+    df = pd.read_csv(csv_yolu(yil), encoding="utf-8-sig", dtype={"tarih": str})
     wb = Workbook()
     ws = wb.active
     ws.title = "Bilgi"
@@ -249,27 +265,29 @@ def excel_yaz(yil, tablolar):
               ("Haftalar", f"{tarihler[0]} – {tarihler[-1]} ({len(tarihler)} hafta)"),
               ("Gruplar", ", ".join(GRUP_SIRA)),
               ("Güncelleme", datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")),
-              ("Not", "Haftalık veriler geçicidir; BDDK sonraki haftalarda revize edebilir. Değerler nominaldir.")]:
+              ("Not", "Haftalık veriler geçicidir; BDDK sonraki haftalarda revize edebilir. Değerler nominaldir. "
+                      "Yabancı Para Pozisyonu tablosunda BDDK yalnız Toplam sütununu yayımlar.")]:
         ws.append(r)
     ws["A1"].font = Font(bold=True, size=13)
     ws.column_dimensions["A"].width = 14
     ws.column_dimensions["B"].width = 100
     gs = {g: i for i, g in enumerate(GRUP_SIRA)}
-    for n, t in sorted(tablolar.items(), key=lambda x: int(x[0])):
+    for n, t in sorted(meta.items(), key=lambda x: int(x[0])):
         d = df[df.tablo_no == int(n)]
         if d.empty:
             continue
-        p = d.pivot_table(index=["tarih", "grup", "sira", "kalem"], columns="sutun", values="deger",
-                          aggfunc="first", sort=False).reset_index()
-        p = p[["tarih", "grup", "sira", "kalem"] + [s for s in SUTUNLAR if s in p.columns]]
-        p = p.assign(_g=p.grup.map(gs).fillna(99)).sort_values(["tarih", "_g", "sira"]).drop(columns="_g")
-        s = wb.create_sheet(re.sub(r"[\\/*?:\[\]]", "", t["ad"])[:31])
-        s.append(["Tarih", "Grup", "Sıra", "Kalem"] + list(p.columns[4:]))
+        sira = {k["id"]: (k["sira"], k["ad"]) for k in t["kalemler"]}
+        d = d.assign(sira=d.kalem_id.map(lambda k: sira.get(k, (999, ""))[0]),
+                     kalem=d.kalem_id.map(lambda k: sira.get(k, (999, str(k)))[1]),
+                     _g=d.grup.map(gs).fillna(99)).sort_values(["tarih", "_g", "sira"])
+        cols = ["Toplam"] if int(n) in YALNIZ_TOPLAM else SUTUNLAR
+        s = wb.create_sheet(sayfa_adi(t["ad"]))
+        s.append(["Tarih", "Grup", "Sıra", "Kalem"] + cols)
         for c in s[1]:
             c.font = Font(bold=True, color="FFFFFF")
             c.fill = PatternFill("solid", fgColor="1F3864")
             c.alignment = Alignment(horizontal="center")
-        for row in p.itertuples(index=False):
+        for row in d[["tarih", "grup", "sira", "kalem"] + cols].itertuples(index=False):
             s.append([None if (isinstance(v, float) and pd.isna(v)) else v for v in row])
         for col, w in zip("ABCDEFG", [11, 20, 6, 60, 16, 16, 16]):
             s.column_dimensions[col].width = w
@@ -316,9 +334,9 @@ def main():
             sys.exit("--baslangic ve --bitis ya da --guncelle gerekli")
         parcalar = yil_parcalari(tarihler, range(a.baslangic, a.bitis + 1))
 
-    df = cek(parcalar, tablolar, a.paralel)
-    kontrol(df)
-    yillar = kaydet(df)
+    w = genislet(cek(parcalar, tablolar, a.paralel))
+    kontrol(w)
+    yillar = kaydet(w)
     KOK.mkdir(parents=True, exist_ok=True)
     meta = {str(n): {"bddk_id": t["bddk_id"], "ad": t["ad"],
                      "kalemler": [{"id": i, "sira": s + 1, "ad": k} for s, (i, k) in enumerate(t["kalemler"])]}
@@ -327,7 +345,7 @@ def main():
     for yil in yillar:
         excel_yaz(yil, meta)
         print(f"  Excel yazıldı: {yil}", flush=True)
-    son = max(pd.read_csv(f, usecols=["tarih"], dtype=str).tarih.max() for f in (KOK / "uzun").glob("*.csv"))
+    son = max(pd.read_csv(f, usecols=["tarih"], dtype=str).tarih.max() for f in (KOK / "csv").glob("*.csv"))
     (KOK / "son_tarih.txt").write_text(son + "\n", "utf-8")
     print(f"Arşivde son hafta: {son}")
 

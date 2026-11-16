@@ -2,6 +2,27 @@
 
 BDDK'nın yayımladığı bankacılık sektörü verilerinin otomatik arşivi. Sitede "BDDK Verileri" sekmesinin kaynağıdır. TBB verilerinden ayrı tutulur.
 
+## Haftalık Bülten (`veri/haftalik/`)
+
+Kaynak: [BDDK Haftalık Bülten](https://www.bddk.org.tr/BultenHaftalik), Gelişmiş Gösterim (tam hassasiyet, 5 ondalık). BDDK bu bülten için ayrı bir metaveri yayımlamıyor.
+
+- **Dönem:** 3 Ocak 2014'ten bugüne, her cuma (671+ hafta)
+- **Tablolar (9):** Krediler, Takipteki Alacaklar, Menkul Değerler, Mevduat, Diğer Bilanço Kalemleri, Bilanço Dışı İşlemler, Bankalarda Saklanan Menkul Değerler 1 ve 2, Yabancı Para Pozisyonu (toplam 201 kalem)
+- **Gruplar (10):** aylık bültenle aynı
+- **Birim:** milyon TL
+
+| Dosya | İçerik |
+|---|---|
+| `csv/bddk_haftalik_<yıl>.csv` | `tarih, tablo_no, grup, kalem_id, TP, YP, Toplam` (UTF-8 BOM) |
+| `kalemler.json` | Tablo adları; her kalemin `id`, `sira` ve `ad` bilgisi |
+| `excel/BDDK_Haftalik_Arsiv_<yıl>.xlsx` | Bilgi sayfası + her tablo için bir sayfa (kalem adlarıyla) |
+| `son_tarih.txt` | Arşivdeki en son hafta |
+
+Notlar:
+- Yabancı Para Pozisyonu tablosunda BDDK yalnız Toplam sütununu doldurur; TP ve YP boştur.
+- Bazı kalemler yalnız belli dönemlerde vardır (ör. menkul değerlerin eski kırılımı 2022/09'a, eski YP pozisyonu kalemleri 2023/01'e kadar; KKM 2022/02–2026/09; kredili mevduat hesapları 2022/09'dan itibaren).
+- `.github/workflows/bddk-haftalik.yml` her gün çalışır; yeni hafta yayımlandıysa son 13 haftayı (revizyonlar için) yeniden çeker. Elle çalıştırırken yıl aralığı verilebilir.
+
 ## Rapor (`docs/index.html`)
 
 Tek dosyalık etkileşimli rapor (TBB raporuyla aynı tasarım): özet göstergeler ve uzun dönem grafikleri, banka gruplarının karşılaştırması, bilanço yapısı ve 17 tablonun bütün kalemlerini gezme (gruplar yan yana / zaman serisi, kalem grafiği, CSV indirme). `scripts/rapor_olustur.py` veriden üretir; iş akışı veri değiştiğinde yeniden üretir.
